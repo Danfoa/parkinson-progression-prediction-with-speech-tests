@@ -1,0 +1,8 @@
+
+.idea/
+*.pdf
+*.ini
+*.pyc
+**/__MACOSX/
+__MACOSX/
+__pycache__/
