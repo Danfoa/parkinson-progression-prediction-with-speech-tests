@@ -1,7 +1,7 @@
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
-class SelfOrganizingMap:
 
+class LDA:
     def __init__(self, dataset):
         self.dataset = dataset
         self.model = None

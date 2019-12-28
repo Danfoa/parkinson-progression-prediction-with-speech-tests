@@ -1,19 +1,16 @@
 import time
-import pandas as pd
-from utils import DatasetLoader
+from utils.dataset_loader import ParkinsonDataset
 import numpy as np
 from sklearn.metrics import accuracy_score
-from som import SelfOrganizingMap
-from em import ExpectationMaximization
-from amfis_model import AMFIS
-from regresion_neural_network import RegressionNeuralNetwork
-from support_vector_machine_regression import SupportVectorMachineRegression
-from cart_model import ClassificationRegressionTree
+from unnecesary_classes.som import SelfOrganizingMap
+from unnecesary_classes.em import ExpectationMaximization
+from regression_models.amfis_model import AMFIS
+from regression_models.regresion_neural_network import RegressionNeuralNetwork
+from unnecesary_classes.support_vector_machine_regression import SupportVectorMachineRegression
+from regression_models.cart_model import ClassificationRegressionTree
 
-from sklearn.decomposition import (
-    PCA,
-    IncrementalPCA
-)
+from sklearn.decomposition import PCA
+
 
 class Experiment:
     PCA_NUMBER_OF_FEATURES = 2
@@ -33,7 +30,6 @@ class Experiment:
         msk = np.random.rand(len(self.dataset)) < 0.8
         self.training_sets = self.dataset[msk]
         self.test_sets = self.dataset[~msk]
-
 
     def __evaluate(self, configuration):
         accuracy_scores = []
@@ -59,14 +55,13 @@ class Experiment:
         print("   Total Execution Time {}".format(conf_elapsed_time))
         return avg_accuracy, avg_exec_time
 
-
     def __evaluate_execution(self, configuration, training_set, test_set):
         trial_run_start_time = time.process_time()
-        configuration.learn(training_set)
+        configuration.fit(training_set)
         trial_run_elapsed_time = time.process_time() - trial_run_start_time
         print("     . Learning time\t\t{}".format(trial_run_elapsed_time))
         trial_run_start_time = time.process_time()
-        results = configuration.classify(test_set)
+        results = configuration.predict(test_set)
         y_labels = test_set[:, -1]
         trial_run_accuracy = accuracy_score(results, y_labels)
         trial_run_elapsed_time = time.process_time() - trial_run_start_time
@@ -90,7 +85,6 @@ class Experiment:
         pca_sklrn = PCA(self.dataset, Experiment.PCA_NUMBER_OF_FEATURES)
         pca_sklrn_result = pca_sklrn.fit_transform(self.dataset.to_numpy())
 
-
         # Learn and Classify non Linear Models
         configurations = self.__build_configurations()
         for configuration in configurations:
@@ -104,11 +98,10 @@ class Experiment:
             ClassificationRegressionTree()
         ]
 
-        configurations =[]
+        configurations = []
         for d in non_linear_algorithms:
             configurations.append(d)
         return configurations
-
 
     def __num_of_rows(self):
         n_train = len(self.training_sets[0])
@@ -116,13 +109,12 @@ class Experiment:
         return n_train + n_test
 
     def __experiment_init(self):
-        self.dataset = DatasetLoader.load_temporal_dataset()
+        self.dataset = ParkinsonDataset.load_temporal_dataset()
         self.__split_dataset()
 
         num_rows = self.__num_of_rows()
         exp = self.experiment_name
         print("Experimentation: {}, in \033[0m (N={})".format(exp, self.experiment_name, num_rows))
-
 
     def __train_som_model(self, data, num_clusters):
         model = SelfOrganizingMap(data, num_clusters)
@@ -130,18 +122,16 @@ class Experiment:
         return model, assignations
 
     def __train_em_model(self, data, num_clusters):
-        #TODO
-        model = ExpectationMaximization(data )
+        # TODO
+        model = ExpectationMaximization(data)
         assignations = model.clusterize()
         return model, assignations
-
 
     def time_series_model(self):
         self.experiment_name = "Time Series Model"
         exp_start_time = time.process_time()
-        df, ids, males, females = DatasetLoader.load_temporal_dataset()
+        df, ids, males, females = ParkinsonDataset.load_temporal_dataset()
         # TODO
-
 
     def evolutionary_model(self):
         self.experiment_name = "Evolutionary Model"
