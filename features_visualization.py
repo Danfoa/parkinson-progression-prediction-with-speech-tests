@@ -10,7 +10,7 @@ from utils import DatasetLoader
 
 if __name__ == '__main__':
 
-    df, ids, males, females = DatasetLoader.load_temporal_dataset()
+    df, ids, males, females = DatasetLoader.load_dataset()
 
     plt.figure(figsize=(15, 15))
     sns.pairplot(df[DatasetLoader.features], kind="reg", palette=plt.bone())

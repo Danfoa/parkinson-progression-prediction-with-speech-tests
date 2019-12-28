@@ -13,7 +13,6 @@ class SelfOrganizingMap:
         self.number_of_rows = dataset.shape[0]
         self.number_of_clusters = nclusters
         self.model = None
-        self.transformed_input = None
         self.__fit()
         self.__transform()
 
