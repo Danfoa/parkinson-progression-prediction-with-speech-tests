@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 from som import SelfOrganizingMap
 from em import ExpectationMaximization
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from amfis_model import AMFIS
 from regresion_neural_network import RegressionNeuralNetwork
 from support_vector_machine_regression import SupportVectorMachineRegression
@@ -40,19 +40,20 @@ class Experiment:
         self.experiment_name = None
 
     def __split_dataset(self):
-        scaler = MinMaxScaler()
-        msk = np.random.rand(len(self.dataset)) < 0.8
+        scaler = StandardScaler()
+        msk = np.random.rand(len(self.dataset)) < 0.6
         self.training_sets = self.dataset[msk]
         self.udprs = self.training_sets["motor_UPDRS"]
         self.total_udprs = self.training_sets["total_UPDRS"]
-        self.training_sets = self.training_sets.drop(['subject#', 'motor_UPDRS','total_UPDRS', 'test_time'], axis=1)
+        self.training_sets = self.training_sets.drop(['subject#', 'motor_UPDRS','total_UPDRS'], axis=1)
+        scaler.fit(self.training_sets)
         self.training_sets = scaler.fit_transform(self.training_sets)
 
-        scaler = MinMaxScaler()
+        scaler = StandardScaler()
         self.test_sets = self.dataset[~msk]
         self.y_udprs = self.test_sets["motor_UPDRS"]
         self.y_total_udprs = self.test_sets["total_UPDRS"]
-        self.test_sets = self.test_sets.drop(['subject#', 'motor_UPDRS','total_UPDRS', 'test_time'], axis=1)
+        self.test_sets = self.test_sets.drop(['subject#', 'motor_UPDRS','total_UPDRS'], axis=1)
         self.test_sets = scaler.fit_transform(self.test_sets)
 
 
@@ -74,18 +75,26 @@ class Experiment:
 
         clusters = defaultdict(list)
         for instance, label, cluster in zip(self.training_sets, self.udprs, em_assignations):
-            clusters[cluster].append((instance, label))
+            clusters[cluster].append(instance)
 
         results = defaultdict(list)
+        i = 0
         for cluster in clusters.values():
-            features = [i[0] for i in cluster]
-            pca = PCA().fit(features)
-            plt.figure()
-            plt.plot(np.cumsum(pca.explained_variance_ratio_))
-            plt.xlabel('Number of Components')
-            plt.ylabel('Variance (%)')  # for each component
-            plt.title('Pulsar Dataset Explained Variance')
-            plt.show()
+            initial_features = len(cluster[0])
+            print("Cluster no={}".format(i))
+
+            n_components = self.PCA_NUMBER_OF_FEATURES
+            for x in range(2, initial_features):
+                pca = PCA(n_components = x)
+                pca.fit(cluster)
+                variances = pca.explained_variance_ratio_
+                variances[x-1] = variances[x-1] + variances[x-2]
+                if variances[x] >= 0.9:
+                    n_components = x
+                    break
+
+            cluster = pca.transform(cluster)
+
 
             # amfis = AMFIS(cluster)
             # result = amfis.learn()
@@ -93,10 +102,7 @@ class Experiment:
 
         # Plotting the Cumulative Summation of the Explained Variance
 
-
-        pca_sklrn = PCA(self.training_sets, Experiment.PCA_NUMBER_OF_FEATURES)
-        pca_sklrn_result = pca_sklrn.fit_transform(self.training_sets)
-
+        print()
 
 
     def __experiment_init(self):
