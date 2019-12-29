@@ -94,7 +94,7 @@ class ParkinsonDataset:
         """
 
         X = dataset[ParkinsonDataset.FEATURES].values
-        y = dataset[ParkinsonDataset.TOTAL_UPDRS, ParkinsonDataset.MOTOR_UPDRS].values
+        y = dataset[[ParkinsonDataset.TOTAL_UPDRS, ParkinsonDataset.MOTOR_UPDRS]].values
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_size, test_size=test_size)
 
