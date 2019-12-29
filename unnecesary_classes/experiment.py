@@ -2,138 +2,122 @@ import time
 from utils.dataset_loader import ParkinsonDataset
 import numpy as np
 from sklearn.metrics import accuracy_score
-from unnecesary_classes.som import SelfOrganizingMap
-from unnecesary_classes.em import ExpectationMaximization
-from regression_models.amfis_model import AMFIS
-from regression_models.regresion_neural_network import RegressionNeuralNetwork
-from unnecesary_classes.support_vector_machine_regression import SupportVectorMachineRegression
-from regression_models.cart_model import ClassificationRegressionTree
+from som import SelfOrganizingMap
+from em import ExpectationMaximization
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+from amfis_model import AMFIS
+from regresion_neural_network import RegressionNeuralNetwork
+from support_vector_machine_regression import SupportVectorMachineRegression
+from cart_model import ClassificationRegressionTree
+from matplotlib import pyplot as plt
+from collections import defaultdict
 
-from sklearn.decomposition import PCA
+
+
+from sklearn.decomposition import (
+    PCA,
+    IncrementalPCA
+)
 
 
 class Experiment:
     PCA_NUMBER_OF_FEATURES = 2
+    CROSS_VALIDATION_S = 1
+    SOM_CLUSTERS = 9  # According to Nilashi2019 paper
+    EM_CLUSTERS = 13 # According to Nilashi2019 paper
 
     def __init__(self):
-        # dataset = df.drop(['subject#', 'motor_UPDRS','total_UPDRS', 'test_time'], axis=1)
-        # udprs = df["motor_UPDRS"]
-        # total_udprs = df["total_UPDRS"]
-
         self.dataset = None
+
         self.training_sets = []
+        self.udprs = None
+        self.total_udprs = None
+
         self.test_sets = []
+        self.y_udprs = None
+        self.y_total_udprs = None
 
         self.experiment_name = None
 
     def __split_dataset(self):
-        msk = np.random.rand(len(self.dataset)) < 0.8
+        scaler = StandardScaler()
+        msk = np.random.rand(len(self.dataset)) < 0.6
         self.training_sets = self.dataset[msk]
+        self.udprs = self.training_sets["motor_UPDRS"]
+        self.total_udprs = self.training_sets["total_UPDRS"]
+        self.training_sets = self.training_sets.drop(['subject#', 'motor_UPDRS','total_UPDRS'], axis=1)
+        scaler.fit(self.training_sets)
+        self.training_sets = scaler.fit_transform(self.training_sets)
+
+        scaler = StandardScaler()
         self.test_sets = self.dataset[~msk]
+        self.y_udprs = self.test_sets["motor_UPDRS"]
+        self.y_total_udprs = self.test_sets["total_UPDRS"]
+        self.test_sets = self.test_sets.drop(['subject#', 'motor_UPDRS','total_UPDRS'], axis=1)
+        self.test_sets = scaler.fit_transform(self.test_sets)
 
-    def __evaluate(self, configuration):
-        accuracy_scores = []
-        execution_times = []
-        self.announce_configuration(configuration)
-        conf_start_time = time.process_time()
-        for trial in range(self.CROSS_VALIDATION_S):
-            print("   - Processing trial #{:02d}".format(trial))
-            training_set = self.training_sets[trial]
-            test_set = self.test_sets[trial]
-            acc, t = self.__evaluate_execution(configuration, training_set, test_set)
-            print("     . Accuracy\t\t\t\t{}".format(acc))
-            print("     . Execution time\t\t{} seconds".format(t))
-
-            accuracy_scores.append(acc)
-            execution_times.append(t)
-        avg_accuracy = np.mean(accuracy_scores)
-        avg_exec_time = np.mean(execution_times)
-        print("   Average Accuracy {}".format(avg_accuracy))
-        print("   Average Execution Time {}".format(avg_exec_time))
-
-        conf_elapsed_time = time.process_time() - conf_start_time
-        print("   Total Execution Time {}".format(conf_elapsed_time))
-        return avg_accuracy, avg_exec_time
-
-    def __evaluate_execution(self, configuration, training_set, test_set):
-        trial_run_start_time = time.process_time()
-        configuration.fit(training_set)
-        trial_run_elapsed_time = time.process_time() - trial_run_start_time
-        print("     . Learning time\t\t{}".format(trial_run_elapsed_time))
-        trial_run_start_time = time.process_time()
-        results = configuration.predict(test_set)
-        y_labels = test_set[:, -1]
-        trial_run_accuracy = accuracy_score(results, y_labels)
-        trial_run_elapsed_time = time.process_time() - trial_run_start_time
-        return trial_run_accuracy, trial_run_elapsed_time
 
     def announce_configuration(self, conf):
         ds = self.experiment_name
         print()
         print(" * Experiment {}".format(ds))
 
-    def non_linear_model(self):
-        self.experiment_name = "Non-Linear Model"
+    def anfis_model(self):
+        self.experiment_name = "ANFIS Model"
         self.__experiment_init()
         exp_start_time = time.process_time()
 
-        # TODO
-        model, assignations = self.__train_som_model(self.dataset)
-        model, assignations = self.__train_em_model(self.dataset)
 
-        # TODO:  LDA and PCA
-        pca_sklrn = PCA(self.dataset, Experiment.PCA_NUMBER_OF_FEATURES)
-        pca_sklrn_result = pca_sklrn.fit_transform(self.dataset.to_numpy())
+        # som_model, som_assignations = self.__train_som_model(self.training_sets, num_clusters=self.SOM_CLUSTERS)
 
-        # Learn and Classify non Linear Models
-        configurations = self.__build_configurations()
-        for configuration in configurations:
-            acc, exect = self.__evaluate(configuration)
 
-    def __build_configurations(self):
-        non_linear_algorithms = [
-            AMFIS(),
-            RegressionNeuralNetwork(),
-            SupportVectorMachineRegression(),
-            ClassificationRegressionTree()
-        ]
+        em_model, em_assignations = self.__train_em_model(self.training_sets)
 
-        configurations = []
-        for d in non_linear_algorithms:
-            configurations.append(d)
-        return configurations
+        clusters = defaultdict(list)
+        for instance, label, cluster in zip(self.training_sets, self.udprs, em_assignations):
+            clusters[cluster].append(instance)
 
-    def __num_of_rows(self):
-        n_train = len(self.training_sets[0])
-        n_test = len(self.test_sets[0])
-        return n_train + n_test
+        results = defaultdict(list)
+        i = 0
+        for cluster in clusters.values():
+            initial_features = len(cluster[0])
+            print("Cluster no={}".format(i))
+
+            n_components = self.PCA_NUMBER_OF_FEATURES
+            for x in range(2, initial_features):
+                pca = PCA(n_components = x)
+                pca.fit(cluster)
+                variances = pca.explained_variance_ratio_
+                variances[x-1] = variances[x-1] + variances[x-2]
+                if variances[x] >= 0.9:
+                    n_components = x
+                    break
+
+            cluster = pca.transform(cluster)
+
+
+            # amfis = AMFIS(cluster)
+            # result = amfis.learn()
+
+
+        # Plotting the Cumulative Summation of the Explained Variance
+
+        print()
+
 
     def __experiment_init(self):
-        self.dataset = ParkinsonDataset.load_temporal_dataset()
+        self.dataset = DatasetLoader.load_dataset()
+
         self.__split_dataset()
-
-        num_rows = self.__num_of_rows()
         exp = self.experiment_name
-        print("Experimentation: {}, in \033[0m (N={})".format(exp, self.experiment_name, num_rows))
+        print("Experimentation: {}".format(exp))
 
-    def __train_som_model(self, data, num_clusters):
+
+    def __train_som_model(self, data, num_clusters = None):
         model = SelfOrganizingMap(data, num_clusters)
         assignations = model.clusterize()
         return model, assignations
 
-    def __train_em_model(self, data, num_clusters):
-        # TODO
-        model = ExpectationMaximization(data)
-        assignations = model.clusterize()
+    def __train_em_model(self, data):
+        model, assignations = ExpectationMaximization(data).fit_tranform()
         return model, assignations
-
-    def time_series_model(self):
-        self.experiment_name = "Time Series Model"
-        exp_start_time = time.process_time()
-        df, ids, males, females = ParkinsonDataset.load_temporal_dataset()
-        # TODO
-
-    def evolutionary_model(self):
-        self.experiment_name = "Evolutionary Model"
-        exp_start_time = time.process_time()
-        # TODO
