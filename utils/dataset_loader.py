@@ -3,6 +3,7 @@ import pandas
 from copy import copy
 
 from sklearn.preprocessing import MinMaxScaler
+import os
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 
@@ -23,6 +24,7 @@ class ParkinsonDataset:
         :param return_gender: True to return ids of males and females participants
         :return: 
         """
+        path = os.path.join('..', path)
         df = pandas.read_csv(path, sep=',')
 
         # Remove instances with NAN values ____________________________________________

@@ -6,6 +6,7 @@ from sklearn.mixture import GaussianMixture
 import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('fivethirtyeight')
+import os
 
 
 
@@ -18,21 +19,23 @@ class ExpectationMaximization:
 
     def fit_tranform(self):
         n_components = np.arange(1, 21)
-        models = [GaussianMixture(n, covariance_type='full', max_iter=200).fit(self.data) for n in n_components]
+        models = [GaussianMixture(n, covariance_type='full', n_init=2, max_iter=400)
+                      .fit(self.data) for n in n_components]
 
         aic = [m.aic(self.data) for m in models]
         bic = [m.bic(self.data) for m in models]
 
-        print(["Components={} has aic={} ".format(a, b)for a, b in zip(n_components, bic)])
-        min_idx = int(np.argmin(aic))
-        self.model = models[min_idx]
+        min_idx_bic = int(np.argmin(bic))
+        min_idx_aic =  int(np.argmin(aic))
+        self.model = models[min_idx_bic]
 
         plt.plot(n_components, aic, label='AIC')
         plt.plot(n_components, bic, label='BIC')
 
         plt.legend(loc='best')
         plt.xlabel('n_components')
-        plt.savefig("out/EM_BIC_AIC.png")
+        path = os.path.join('..', 'out/EM_BIC_AIC.png')
+        plt.savefig(path)
         plt.close()
 
         self.model.fit(self.data)
@@ -41,6 +44,3 @@ class ExpectationMaximization:
 
 
         return self.model, labels
-
-
-
