@@ -16,7 +16,8 @@ if __name__ == '__main__':
     load_path = "../../results/clustering/"
     save_path = "../../results/reduction/"
 
-    clustering_algorithms = ["fuzzy_c_means"]
+    clustering_algorithms = ["fuzzy_c_means", "som", "em"]
+    clusters = [[4,5], [9], [12]]
 
 
     # loading the dataset
@@ -30,8 +31,9 @@ if __name__ == '__main__':
 
     X = df[ParkinsonDataset.FEATURES].values
 
-    for algorithm in clustering_algorithms:
-        for c in [4, 5]:
+    for i in range(len(clustering_algorithms)):
+        algorithm = clustering_algorithms[i]
+        for c in clusters[i]:
             labels = numpy.load(load_path + algorithm + '/C=%d-labels.npy' % c)
             for k in range(c):
                 reduced_dataset = get_reduced_dataset(X[numpy.where(labels == k)], X)
