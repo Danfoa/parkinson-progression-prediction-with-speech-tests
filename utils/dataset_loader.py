@@ -41,7 +41,17 @@ class ParkinsonDataset:
             males = numpy.unique(df[df["sex"] == 0]["subject#"])
             females = numpy.unique(df[df["sex"] == 1]["subject#"])
             print("- %d males: %s\n- %d females %s" % (len(males), males, len(females), females))
-            return df, participants, males, females
+            male_records, female_records = df[ParkinsonDataset.SUBJECT_ID] == males[0], df[ParkinsonDataset.SUBJECT_ID] == females[0]
+            for id in males:
+                male_records = numpy.logical_or(male_records, df[ParkinsonDataset.SUBJECT_ID] == id)
+
+            for id in females:
+                female_records = numpy.logical_or(female_records, df[ParkinsonDataset.SUBJECT_ID] == id)
+
+            df_males = df.loc[male_records, :]
+            df_females = df.loc[female_records, :]
+
+            return df, participants, df_males, df_females
         else:
             return df
 
