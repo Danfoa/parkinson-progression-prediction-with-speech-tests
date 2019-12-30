@@ -3,7 +3,7 @@ import numpy
 
 # Sklearn imports
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-from sklearn.svm import SVR
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error
 from sklearn.decomposition import PCA
@@ -13,7 +13,7 @@ from utils.dataset_loader import ParkinsonDataset
 from utils.visualizer import *
 
 if __name__ == '__main__':
-    model = "SVR"
+    model = "GBR"
     # Example of loading the dataset _________________________________________________________________
     df = ParkinsonDataset.load_dataset(path="dataset/parkinsons_updrs.data",
                                        return_gender=False)
@@ -52,9 +52,10 @@ if __name__ == '__main__':
 
         # SVR Hyper-Parameter search _____________________________________________________________________
         # Define Model, params and grid search scheme with cross validation.
-        parameters = {'C': [0.01, 0.1, 1, 10, 1e2],
-                      'gamma': [0.01, 0.1, 1, 5]}
-        svr = SVR(kernel='rbf')
+        parameters = {'loss': ['ls', 'lad'],
+                      'learning_rate': [0.001, 0.01, 0.1, 0.5],
+                      'max_depth': [3, 4, 5, 6]}
+        svr = GradientBoostingRegressor(n_estimators=1500)
         clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=3)
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
