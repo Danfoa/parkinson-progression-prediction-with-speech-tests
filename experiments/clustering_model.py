@@ -29,7 +29,7 @@ SOM_CLUSTERS = 9  # According to Nilashi2019 paper
 EM_CLUSTERS = 13  # According to Nilashi2019 paper
 
 
-def __train_som_model(self, data, num_clusters=None):
+def __train_som_model(data, num_clusters=None):
     model = SelfOrganizingMap(data, num_clusters)
     assignations = model.clusterize()
     return model, assignations
@@ -37,6 +37,11 @@ def __train_som_model(self, data, num_clusters=None):
 def __train_em_model(data):
     model, assignations = ExpectationMaximization(data).fit_tranform()
     return model, assignations
+
+def get_reduced_dataset(cluster_data, all_data):
+    pca = PCA(.95)
+    pca.fit_transform(cluster_data)
+    return pca.transform(all_data)
 
 
 if __name__ == '__main__':
@@ -57,7 +62,9 @@ if __name__ == '__main__':
     X, X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df,
                                                                       subject_partitioning=False)
 
-    # Step 1: EM - SOM clustering
+    # Step 1: em - SOM clustering
+    som_model, som_assignations = __train_som_model(X, SOM_CLUSTERS)
+
     em_model, em_assignations = __train_em_model(X)
 
     em_number_of_clusters = em_model.n_components
@@ -68,7 +75,10 @@ if __name__ == '__main__':
 
 
     pca_models = []
+    load_path = "../../results/clustering/"
+    save_path = "../../results/reduction/"
     results = defaultdict(list)
+    clustering_algorithms = ['em', 'som']
     for cluster in clusters.values():
         initial_features = len(cluster[0])
 

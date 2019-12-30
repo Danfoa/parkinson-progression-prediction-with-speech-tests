@@ -34,20 +34,21 @@ class ExpectationMaximization:
 
         plt.legend(loc='best')
         plt.xlabel('n_components')
-        path = os.path.join('..', 'out/EM_BIC_AIC.png')
+        path = os.path.join('..', 'results/clustering/em//EM_BIC_AIC.png')
         plt.savefig(path)
         plt.close()
 
         self.model.fit(self.data)
         probabilities = self.model.predict_proba(self.data)
-        path = os.path.join('..', 'results/clustering/EM/')
+        path = os.path.join('..', 'results/clustering/em/')
         np.save(path + 'probabilities', probabilities)
         np.save(path + 'aic', aic)
         np.save(path + 'bic', bic)
 
         print('Converged:',  self.model.converged_)  # Check if the model has converged
         labels = self.model.predict(self.data)
-        np.save(path + 'assignmetnts', labels)
+        path = path + 'C={}-labels'.format(best_n_components)
+        np.save(path, labels)
 
 
         return self.model, labels
