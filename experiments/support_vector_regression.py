@@ -52,10 +52,10 @@ if __name__ == '__main__':
 
         # SVR Hyper-Parameter search _____________________________________________________________________
         # Define Model, params and grid search scheme with cross validation.
-        parameters = {'C': [0.01, 0.1, 1, 10, 1e2],
-                      'gamma': [0.01, 0.1, 1, 5, 10, 50]}
+        parameters = {'C': [0.01, 0.1, 1, 10, 1e2, 1e3],
+                      'gamma': [0.01, 0.1, 1, 5, 10, 100, 500]}
         svr = SVR(kernel='rbf')
-        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=3)
+        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=2)
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
             print("num-PCs=%d Training %s on %s" % (n_components, model, y_type))

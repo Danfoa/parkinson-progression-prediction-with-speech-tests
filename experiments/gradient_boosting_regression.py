@@ -36,7 +36,7 @@ if __name__ == '__main__':
     # ________________________________________________________________________________________________
 
     # Design experiment to train model hyper-parameters:
-    components_vec = numpy.arange(4, 12)
+    components_vec = numpy.arange(4, 16)
     results = pandas.DataFrame(
         columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
         index=components_vec)
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                       'learning_rate': [0.001, 0.01, 0.1, 0.5],
                       'max_depth': [3, 4, 5, 6]}
         svr = GradientBoostingRegressor(n_estimators=1500)
-        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=3)
+        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=2)
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
             print("num-PCs=%d Training %s on %s" % (n_components, model, y_type))
