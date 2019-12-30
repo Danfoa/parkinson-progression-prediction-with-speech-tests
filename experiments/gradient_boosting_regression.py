@@ -36,7 +36,7 @@ if __name__ == '__main__':
     # ________________________________________________________________________________________________
 
     # Design experiment to train model hyper-parameters:
-    components_vec = numpy.arange(4, 16)
+    components_vec = numpy.arange(4, 12)
     results = pandas.DataFrame(
         columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
         index=components_vec)
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         # SVR Hyper-Parameter search _____________________________________________________________________
         # Define Model, params and grid search scheme with cross validation.
         parameters = {'C': [0.01, 0.1, 1, 10, 1e2],
-                      'gamma': [0.01, 0.1, 1, 5, 10, 50]}
+                      'gamma': [0.01, 0.1, 1, 5]}
         svr = SVR(kernel='rbf')
         clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=3)
         # Train two models, one for each target
