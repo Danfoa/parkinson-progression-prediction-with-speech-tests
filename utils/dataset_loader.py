@@ -1,11 +1,11 @@
-import numpy
-import pandas
+import os
 from copy import copy
 
-from sklearn.preprocessing import MinMaxScaler
-import os
-from sklearn.preprocessing import OneHotEncoder
+import numpy
+import pandas
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
+
 
 class ParkinsonDataset:
     SUBJECT_ID = "subject#"
@@ -14,7 +14,7 @@ class ParkinsonDataset:
     TIME = "test_time"
     MOTOR_UPDRS = "motor_UPDRS"
     TOTAL_UPDRS = "total_UPDRS"
-    FEATURES = ["Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer", "Shimmer(dB)",
+    FEATURES = ["sex", "age", "Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer", "Shimmer(dB)",
                 "Shimmer:APQ3", "Shimmer:APQ5", "Shimmer:APQ11", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"]
 
     @staticmethod

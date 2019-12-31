@@ -1,7 +1,8 @@
-from regression_models.anfis_packages.anfis import ANFIS
+import numpy as np
+
 import regression_models.anfis_packages.anfis
 from regression_models.anfis_packages import membershipfunction
-import numpy as np
+from regression_models.anfis_packages.anfis import ANFIS
 
 
 class AMFIS:
@@ -28,15 +29,14 @@ class AMFIS:
 
     def make_gauss_mfs(self, sigma, mu_list):
         '''Return a list of gaussian mfs, same sigma, list of means'''
-        # {'mean':0.,'sigma':1.}
         l = []
         for mu in mu_list:
-            l.append(['gaussmf', {'mean' : mu, 'sigma': sigma}])
+            l.append(['gaussmf', {'mean': mu, 'sigma': sigma}])
         # mf = [GaussMembFunc(mu, sigma) for mu in mu_list]
         return l
 
 
-    def create_gauss_mfs(self, x, num_mfs=3, num_out=2, hybrid=True):
+    def create_gauss_mfs(self, x, num_mfs=2, num_out=2, hybrid=True):
         minvals = np.min(self.data, axis=0)
 
         maxvals = np.max(self.data, axis=0)
@@ -46,23 +46,15 @@ class AMFIS:
             sigma = ranges[i] / num_mfs
             mulist = np.linspace(minvals[i], maxvals[i], num_mfs).tolist()
             invars.append(self.make_gauss_mfs(sigma, mulist))
-
-        outvars = ['y{}'.format(i) for i in range(num_out)]
         return invars
 
 
-class GaussMembFunc(object):
+class GaussMembFunc:
     def __init__(self, mu, sigma):
         super(GaussMembFunc, self).__init__()
         self.mu = mu
         self.sigma = sigma
 
-    def __setitem__(self, mu, sigma):
-        self.mu = mu
-        self.sigma = sigma
-
-    def __getitem__(self, arg: object) -> object:
-        return GaussMembFunc[arg]
 
     def forward(self, x):
         val = np.exp(-np.pow(x - self.mu, 2) / (2 * self.sigma**2))
