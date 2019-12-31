@@ -1,0 +1,13 @@
+,Total-Test,Total-Params,Motor-Test,Motor-Params
+4,-9.847974448340425,"{'criterion': 'mae', 'n_estimators': 100}",-7.254721097744679,"{'criterion': 'mae', 'n_estimators': 200}"
+5,-9.831527939148934,"{'criterion': 'mae', 'n_estimators': 200}",-7.258231305446808,"{'criterion': 'mae', 'n_estimators': 100}"
+6,-9.869924499999996,"{'criterion': 'mae', 'n_estimators': 200}",-7.219907908,"{'criterion': 'mae', 'n_estimators': 200}"
+7,-9.802248441134752,"{'criterion': 'mae', 'n_estimators': 150}",-7.270126558978723,"{'criterion': 'mae', 'n_estimators': 50}"
+8,-9.770098759375886,"{'criterion': 'mae', 'n_estimators': 150}",-7.206539692595745,"{'criterion': 'mae', 'n_estimators': 50}"
+9,-9.861870360397162,"{'criterion': 'mae', 'n_estimators': 150}",-7.21146298587234,"{'criterion': 'mae', 'n_estimators': 150}"
+10,-9.919777436425532,"{'criterion': 'mae', 'n_estimators': 100}",-7.2224192188085095,"{'criterion': 'mae', 'n_estimators': 200}"
+11,-9.895182580553191,"{'criterion': 'mae', 'n_estimators': 200}",-7.185308096000001,"{'criterion': 'mae', 'n_estimators': 150}"
+12,-9.87604196851064,"{'criterion': 'mae', 'n_estimators': 100}",-7.1711735479148935,"{'criterion': 'mae', 'n_estimators': 50}"
+13,-9.88939048431206,"{'criterion': 'mae', 'n_estimators': 150}",-7.180685728765957,"{'criterion': 'mae', 'n_estimators': 100}"
+14,-9.883705300879432,"{'criterion': 'mae', 'n_estimators': 150}",-7.186910862255319,"{'criterion': 'mae', 'n_estimators': 200}"
+15,-9.903819409872339,"{'criterion': 'mae', 'n_estimators': 200}",-7.149589292936171,"{'criterion': 'mae', 'n_estimators': 200}"
