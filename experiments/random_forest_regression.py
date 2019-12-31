@@ -3,7 +3,7 @@ import numpy
 
 # Sklearn imports
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error
 from sklearn.decomposition import PCA
@@ -13,7 +13,7 @@ from utils.dataset_loader import ParkinsonDataset
 from utils.visualizer import *
 
 if __name__ == '__main__':
-    model = "GBR"
+    model = "RFR"
     # Example of loading the dataset _________________________________________________________________
     df = ParkinsonDataset.load_dataset(path="dataset/parkinsons_updrs.data",
                                        return_gender=False)
@@ -47,16 +47,15 @@ if __name__ == '__main__':
         pca.fit(X_all)
         # Transform dataset to new vector space
         X_all_transformed = pca.transform(X_all - X_all.mean(axis=0))
+        # X_train_transformed = pca.transform(X_train - X_train.mean(axis=0))
+        # X_test_transformed = pca.transform(X_test - X_test.mean(axis=0))
 
-        # GBR Hyper-Parameter search _____________________________________________________________________
+        # SVR Hyper-Parameter search _____________________________________________________________________
         # Define Model, params and grid search scheme with cross validation.
-        parameters = {'loss': ['ls', 'lad'],
-                      'learning_rate': [0.001, 0.01, 0.1, 0.5],
-                      'max_depth': [3, 4, 5, 6]}
-                      
-        svr = GradientBoostingRegressor(n_estimators=1500)
-        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=2)
-
+        parameters = {'n_estimators': [10, 50, 100, 150, 200],
+                      'criterion': ['mae']}
+        rfr = RandomForestRegressor()
+        clf = GridSearchCV(rfr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=2, n_jobs=3)
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
             print("num-PCs=%d Training %s on %s" % (n_components, model, y_type))
@@ -71,6 +70,4 @@ if __name__ == '__main__':
             print(results)
     results.to_csv("../results/outputs/%s/MAE-diff-components.csv" % model)
     print(results)
-    _____________________________________________________________________________________________________
-    # Experiment on Recursive feature elimination
 

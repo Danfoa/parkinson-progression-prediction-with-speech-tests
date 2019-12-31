@@ -4,8 +4,11 @@ from copy import copy
 
 from sklearn.preprocessing import MinMaxScaler
 import os
+
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
+from sklearn.feature_selection import RFECV
+
 
 class ParkinsonDataset:
     SUBJECT_ID = "subject#"
@@ -14,7 +17,7 @@ class ParkinsonDataset:
     TIME = "test_time"
     MOTOR_UPDRS = "motor_UPDRS"
     TOTAL_UPDRS = "total_UPDRS"
-    FEATURES = ["Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer", "Shimmer(dB)",
+    FEATURES = ["age", "Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer", "Shimmer(dB)",
                 "Shimmer:APQ3", "Shimmer:APQ5", "Shimmer:APQ11", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"]
 
     @staticmethod
@@ -41,7 +44,17 @@ class ParkinsonDataset:
             males = numpy.unique(df[df["sex"] == 0]["subject#"])
             females = numpy.unique(df[df["sex"] == 1]["subject#"])
             print("- %d males: %s\n- %d females %s" % (len(males), males, len(females), females))
-            return df, participants, males, females
+            male_records, female_records = df[ParkinsonDataset.SUBJECT_ID] == males[0], df[ParkinsonDataset.SUBJECT_ID] == females[0]
+            for id in males:
+                male_records = numpy.logical_or(male_records, df[ParkinsonDataset.SUBJECT_ID] == id)
+
+            for id in females:
+                female_records = numpy.logical_or(female_records, df[ParkinsonDataset.SUBJECT_ID] == id)
+
+            df_males = pandas.DataFrame(df.loc[male_records, :])
+            df_females = pandas.DataFrame(df.loc[female_records, :])
+
+            return df, participants, df_males, df_females
         else:
             return df
 
@@ -101,3 +114,27 @@ class ParkinsonDataset:
         X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=train_size, test_size=test_size)
 
         return X_train, X_test, y_train, y_test
+
+    @staticmethod
+    def recursive_feature_elimination(model, X, y_total, y_motor, cv=3):
+        """
+        Wrapper to Recursive Feature Elimination with Cross Validation for the Parkinson Telemonitoring dataset.
+        :param model: Regressor model to analyse
+        :param X: Training data
+        :param y_total: Target Total UPDRS values
+        :param y_motor: Target Motor UPDRS values
+        :param cv: Number of CrossValidation folds
+        :return: feature_masks, mae_log
+                 - feature_masks: Dictionary holding boolean mask indicating the selected features
+                 - mae_log: Dictionary holding the MAE values with different number of features.
+                 Keys=["Total", "Motor"]
+        """
+        feature_masks = {}
+        mae_log = {}
+        rfecv = RFECV(estimator=model, step=1, cv=cv, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=0)
+        for y_target, y_type in zip([y_total, y_motor], ['Total', 'Motor']):
+            rfecv.fit(X, y_target)
+            feature_masks[y_type] = rfecv.support_
+            mae_log[y_type] = rfecv.grid_scores_ * -1
+
+        return feature_masks, mae_log
