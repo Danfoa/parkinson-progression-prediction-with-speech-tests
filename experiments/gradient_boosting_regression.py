@@ -48,14 +48,12 @@ if __name__ == '__main__':
         # Transform dataset to new vector space
         X_all_transformed = pca.transform(X_all - X_all.mean(axis=0))
 
-        # GBR Hyper-Parameter search _____________________________________________________________________
+        # GBR Hyper-Parameter search _______________________
         # Define Model, params and grid search scheme with cross validation.
-        parameters = {'loss': ['ls', 'lad'],
-                      'learning_rate': [0.001, 0.01, 0.1, 0.5],
+        parameters = {'learning_rate': numpy.linspace(0.0001, 0.005, 10),
                       'max_depth': [3, 4, 5, 6]}
-                      
-        svr = GradientBoostingRegressor(n_estimators=1500)
-        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=2)
+        gbr = GradientBoostingRegressor(loss='ls', n_estimators=20000, n_iter_no_change=10, validation_fraction=0.2)
+        clf = GridSearchCV(gbr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=4)
 
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
@@ -71,6 +69,6 @@ if __name__ == '__main__':
             print(results)
     results.to_csv("../results/outputs/%s/MAE-diff-components.csv" % model)
     print(results)
-    _____________________________________________________________________________________________________
+    #_____________________________________________________________________________________________________
     # Experiment on Recursive feature elimination
 
