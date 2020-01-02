@@ -36,7 +36,7 @@ class ANFIS:
         self.memFuncsHomo = all(len(i)==len(self.memFuncsByVariable[0]) for i in self.memFuncsByVariable)
         self.trainingType = 'Not trained yet'
 
-    def LSE(self, A, B, initialGamma = 1000.):
+    def LSE(self, A, B, initialGamma = 5000.):
         coeffMat = A
         rhsMat = B
         S = np.eye(coeffMat.shape[1])*initialGamma
@@ -49,7 +49,7 @@ class ANFIS:
         return x
 
     # def trainHybridJangOffLine(self, epochs=5, tolerance=1e-5, initialGamma=1000, k=0.01):
-    def trainHybridJangOffLine(self, epochs=5, tolerance=1e-5, initialGamma=1000, k=0.01):
+    def trainHybridJangOffLine(self, k, epochs=5, tolerance=1e-5, initialGamma=5000):
 
         self.trainingType = 'trainHybridJangOffLine'
         convergence = False

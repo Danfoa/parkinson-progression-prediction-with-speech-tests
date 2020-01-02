@@ -1,5 +1,6 @@
 import os
 
+import frange as frange
 import numpy as np
 from sklearn.decomposition import (
     PCA
@@ -12,6 +13,7 @@ from clustering_models.som import SelfOrganizingMap
 from regression_models import amfis_model
 from utils.dataset_loader import ParkinsonDataset
 from matplotlib import pyplot as plt
+import decimal
 
 
 """
@@ -61,11 +63,12 @@ def find_accuracy(d, y, y_test, title):
     print()
 
     x = list(range(len(y)))
-    plt.scatter(x, y, color="blue", label="original")
-    plt.plot(x, y_test, color="red", label="predicted")
-    plt.legend()
-    plt.title(title)
-    plt.show()
+    # plt.scatter(x, y, color="blue", label="original")
+    # plt.plot(x, y_test, color="red", label="predicted")
+    # plt.legend()
+    # plt.title(title)
+    # plt.show()
+    return mae_f, r2_f
 
 
 if __name__ == '__main__':
@@ -89,20 +92,24 @@ if __name__ == '__main__':
     path = os.path.join("..", "reduced_datasets/predict_")
     np.save(path + "init_results", y_test)
 
-    y = np.load("reduced_datasets/predict_init.npy")
-    y_test = np.load("reduced_datasets/predict_init_results.npy")
-
     x_train = get_reduced_dataset(X_train, X_train)
     x_test = get_reduced_dataset(X_train, X_test)
 
     model = amfis_model.AMFIS(x_train, y_train)
-    model.fit()
+    model.fit(k=0.0523, gamma=5000)
     path = os.path.join("..", "reduced_datasets/predict_")
     y = model.predict(x_test)
     np.save(path + "init", y)
 
     d0 = y_test[:, 0] - y[:, 0]
     d1 = y_test[:, 1] - y[:, 1]
-    find_accuracy(d0, y[:, 0], y_test[:, 0], "motor_UPDRS")
-    find_accuracy(d1, y[:, 1], y_test[:, 1], "total_UPDRS")
+    mae_t, r_t = find_accuracy(d0, y[:, 0], y_test[:, 0], "total_UPDRS")
+    mae, r = find_accuracy(d1, y[:, 1], y_test[:, 1], "motor_UPDRS")
+    print()
+    print()
+
+
+
+
+
 

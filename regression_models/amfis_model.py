@@ -16,9 +16,9 @@ class AMFIS:
         self.anf = None
 
 
-    def fit(self):
+    def fit(self, k, gamma):
         self.anf = ANFIS(self.data, self.y, self.mfc)
-        self.anf.trainHybridJangOffLine(epochs=10)
+        self.anf.trainHybridJangOffLine(k, initialGamma=gamma, epochs=10)
 
     def predict(self, data):
 
