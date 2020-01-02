@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     # Design experiment to train model hyper-parameters:
     if EXECUTION_MODE == "SEARCH":
-        components_vec = numpy.arange(5, len(PD.FEATURES) + 1)
+        components_vec = numpy.array([6, len(PD.FEATURES)])
         results = pandas.DataFrame(
             columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
             index=components_vec)
