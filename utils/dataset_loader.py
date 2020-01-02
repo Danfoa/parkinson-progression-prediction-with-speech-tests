@@ -8,6 +8,7 @@ import os
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.feature_selection import RFECV
+from sklearn.model_selection import KFold
 
 
 class ParkinsonDataset:
@@ -17,8 +18,9 @@ class ParkinsonDataset:
     TIME = "test_time"
     MOTOR_UPDRS = "motor_UPDRS"
     TOTAL_UPDRS = "total_UPDRS"
-    FEATURES = ["age", "Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer", "Shimmer(dB)",
-                "Shimmer:APQ3", "Shimmer:APQ5", "Shimmer:APQ11", "Shimmer:DDA", "NHR", "HNR", "RPDE", "DFA", "PPE"]
+    FEATURES = ["age", "Jitter(%)", "Jitter(Abs)", "Jitter:RAP", "Jitter:PPQ5", "Jitter:DDP", "Shimmer",
+                "Shimmer(dB)", "Shimmer:APQ3", "Shimmer:APQ5", "Shimmer:APQ11", "Shimmer:DDA", "NHR", "HNR", "RPDE",
+                "DFA", "PPE"]
 
     @staticmethod
     def load_dataset(path="dataset/parkinsons_updrs.data", return_gender=False):
@@ -51,8 +53,8 @@ class ParkinsonDataset:
             for id in females:
                 female_records = numpy.logical_or(female_records, df[ParkinsonDataset.SUBJECT_ID] == id)
 
-            df_males = pandas.DataFrame(df.loc[male_records, :])
-            df_females = pandas.DataFrame(df.loc[female_records, :])
+            df_males = df.loc[male_records, :].copy()
+            df_females = df.loc[female_records, :].copy()
 
             return df, participants, df_males, df_females
         else:
@@ -82,13 +84,15 @@ class ParkinsonDataset:
         feature_normalizers = {}
         # Scale/encode all features
         for feature in ParkinsonDataset.FEATURES:
+            # print(feature, end=', ')
             # Compute average and std of the data to transform
-            scaler.fit(data[feature].values.reshape(-1, 1))
+            scaled_data = scaler.fit_transform(data[feature].values.reshape(-1, 1))
             # Replace original data with
-            data[feature] = scaler.transform(data[feature].values.reshape(-1, 1))
+            data[feature] = scaled_data
             # Save scaler class in case user wants to rescale data
             # TODO: Evaluate if copy or deep copy shall be used, or only saving the parameters.
             feature_normalizers[feature] = copy(scaler)
+        # print()
         if inplace:
             return feature_normalizers
         else:
@@ -137,7 +141,7 @@ class ParkinsonDataset:
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def recursive_feature_elimination(model, X, y_total, y_motor, cv=3):
+    def recursive_feature_elimination(model, X, y_total, y_motor, cv=5):
         """
         Wrapper to Recursive Feature Elimination with Cross Validation for the Parkinson Telemonitoring dataset.
         :param model: Regressor model to analyse
@@ -150,9 +154,11 @@ class ParkinsonDataset:
                  - mae_log: Dictionary holding the MAE values with different number of features.
                  Keys=["Total", "Motor"]
         """
+        print("Recursive feature elimination with model: \n", model)
         feature_masks = {}
         mae_log = {}
-        rfecv = RFECV(estimator=model, step=1, cv=cv, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=0)
+        cv_splitter = KFold(n_splits=5, shuffle=True)
+        rfecv = RFECV(estimator=model, step=1, cv=cv_splitter, scoring='neg_mean_absolute_error', n_jobs=-1, verbose=0)
         for y_target, y_type in zip([y_total, y_motor], ['Total', 'Motor']):
             rfecv.fit(X, y_target)
             feature_masks[y_type] = rfecv.support_

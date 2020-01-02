@@ -1,13 +1,13 @@
 ,Total-Test,Total-Params,Motor-Test,Motor-Params
-4,-9.377636657357122,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.021657869840296,"{'learning_rate': 0.0001, 'max_depth': 4}"
-5,-9.29501627983557,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.085092466861655,"{'learning_rate': 0.0001, 'max_depth': 3}"
-6,-9.4102011039133,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.122006516692813,"{'learning_rate': 0.0001, 'max_depth': 6}"
-7,-9.378676017786674,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.082877556742882,"{'learning_rate': 0.0001, 'max_depth': 4}"
-8,-9.38735857310576,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.10852618479159,"{'learning_rate': 0.0001, 'max_depth': 5}"
-9,-9.422027331997782,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.16191456946238,"{'learning_rate': 0.0001, 'max_depth': 6}"
-10,-9.482451171548986,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.149371650200075,"{'learning_rate': 0.0001, 'max_depth': 6}"
-11,-9.505643464392339,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.186991062896513,"{'learning_rate': 0.0001, 'max_depth': 5}"
-12,-9.50906312205697,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.073357911255845,"{'learning_rate': 0.0001, 'max_depth': 6}"
-13,-9.460325324739706,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.159602485763385,"{'learning_rate': 0.0001, 'max_depth': 6}"
-14,-9.469263943490617,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.137263841423669,"{'learning_rate': 0.0001, 'max_depth': 4}"
-15,-9.514593053477476,"{'learning_rate': 0.0001, 'max_depth': 3}",-7.2059450676088135,"{'learning_rate': 0.0001, 'max_depth': 5}"
+4,,,,
+5,,,,
+6,,,,
+7,,,,
+8,,,,
+9,,,,
+10,,,,
+11,,,,
+12,,,,
+13,,,,
+14,,,,
+15,,,,
