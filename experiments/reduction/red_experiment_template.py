@@ -49,8 +49,8 @@ if __name__ == '__main__':
             y_pred_motor_clusters = numpy.ones((num_clusters, len(test_index)))
             # Iterate through each of the projected data-sets and predict a result
             for cluster in range(num_clusters):
-                X_projected = numpy.load(load_path + algorithm + '/C=%d-K=%d-reduced-dataset.npy' % (num_clusters, cluster))
-
+                X_projected = numpy.load(load_path + algorithm + '/C=%d-K=%d-reduced-dataset.npy' % (num_clusters,
+                                                                                                     cluster))
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
                 #TODO Put your model definition here
@@ -63,11 +63,11 @@ if __name__ == '__main__':
                 y_pred_motor_clusters[cluster, :] = model.predict(X_test)
 
             # TODO: Evaluate other ensembling techniques
-            y_ensembled_total = y_pred_total_clusters.sum(axis=0)
-            y_ensembled_motor = y_pred_motor_clusters.sum(axis=0)
+            y_ensembled_total = y_pred_total_clusters.sum(axis=0) / num_clusters
+            y_ensembled_motor = y_pred_motor_clusters.sum(axis=0) / num_clusters
             # Get results from current fold
             fold_total_MAE = mean_absolute_error(y_true=y_total_test, y_pred=y_ensembled_total)
-            fold_motor_MAE = mean_absolute_error(y_true=y_total_test, y_pred=y_ensembled_total)
+            fold_motor_MAE = mean_absolute_error(y_true=y_motor_test, y_pred=y_ensembled_motor)
             # Save fold value
             total_results.append(fold_total_MAE)
             motor_results.append(fold_motor_MAE)
