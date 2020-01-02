@@ -1,21 +1,19 @@
-import time
-import pandas as pd
 import os
-from utils.dataset_loader import ParkinsonDataset
-import numpy as np
-from sklearn.metrics import accuracy_score
-from clustering_models.som import SelfOrganizingMap
-from clustering_models.em import ExpectationMaximization
-from sklearn.preprocessing import MinMaxScaler, StandardScaler,RobustScaler
-from matplotlib import pyplot as plt
-from collections import defaultdict
-from regression_models import amfis_model
-from sklearn.model_selection import train_test_split
 
+import frange as frange
+import numpy as np
 from sklearn.decomposition import (
-    PCA,
-    IncrementalPCA
+    PCA
 )
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler
+
+from clustering_models.em import ExpectationMaximization
+from clustering_models.som import SelfOrganizingMap
+from regression_models import amfis_model
+from utils.dataset_loader import ParkinsonDataset
+from matplotlib import pyplot as plt
+import decimal
 
 
 """
@@ -29,19 +27,48 @@ SOM_CLUSTERS = 9  # According to Nilashi2019 paper
 EM_CLUSTERS = 13  # According to Nilashi2019 paper
 
 
+def get_reduced_dataset(cluster_data, all_data):
+    pca = PCA(.95)
+    pca.fit_transform(cluster_data)
+    return pca.transform(all_data)
+
+
 def __train_som_model(data, num_clusters=None):
     model = SelfOrganizingMap(data, num_clusters)
     assignations = model.clusterize()
     return model, assignations
 
+
 def __train_em_model(data):
     model, assignations = ExpectationMaximization(data).fit_tranform()
     return model, assignations
 
+
 def get_reduced_dataset(cluster_data, all_data):
-    pca = PCA(.95)
+    pca = PCA(.9)
     pca.fit_transform(cluster_data)
     return pca.transform(all_data)
+
+def find_accuracy(d, y, y_test, title):
+    mse_f = np.mean(d ** 2)
+    mae_f = np.mean(abs(d))
+    rmse_f = np.sqrt(mse_f)
+    r2_f = 1 - (sum(d ** 2) / sum((y - np.mean(y)) ** 2))
+
+    print("Results for {}".format(title))
+    print("MAE:", mae_f)
+    print("MSE:", mse_f)
+    print("RMSE:", rmse_f)
+    print("R-Squared:", r2_f)
+    print()
+
+    x = list(range(len(y)))
+    # plt.scatter(x, y, color="blue", label="original")
+    # plt.plot(x, y_test, color="red", label="predicted")
+    # plt.legend()
+    # plt.title(title)
+    # plt.show()
+    return mae_f, r2_f
 
 
 if __name__ == '__main__':
@@ -54,67 +81,35 @@ if __name__ == '__main__':
     label_total_udprs = df[["total_UPDRS"]]
 
     # Normalizing/scaling  dataset
-    feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=MinMaxScaler(),
-                                                             inplace=True)
+    data, feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
+                                                                   scaler=MinMaxScaler(),
+                                                                   inplace=False)
 
     # # Split dataset
-    X, X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df,
-                                                                      subject_partitioning=False)
+    X, X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=data,
+                                                                         subject_partitioning=False)
 
-    # Step 1: em - SOM clustering
-    som_model, som_assignations = __train_som_model(X, SOM_CLUSTERS)
+    path = os.path.join("..", "reduced_datasets/predict_")
+    np.save(path + "init_results", y_test)
 
-    em_model, em_assignations = __train_em_model(X)
+    x_train = get_reduced_dataset(X_train, X_train)
+    x_test = get_reduced_dataset(X_train, X_test)
 
-    em_number_of_clusters = em_model.n_components
+    model = amfis_model.AMFIS(x_train, y_train)
+    model.fit(k=0.0523, gamma=5000)
+    path = os.path.join("..", "reduced_datasets/predict_")
+    y = model.predict(x_test)
+    np.save(path + "init", y)
 
-    clusters = defaultdict(list)
-    for instance, cluster in zip(X, em_assignations):
-        clusters[cluster].append(instance)
-
-
-    pca_models = []
-    load_path = "../../results/clustering/"
-    save_path = "../../results/reduction/"
-    results = defaultdict(list)
-    clustering_algorithms = ['em', 'som']
-    for cluster in clusters.values():
-        initial_features = len(cluster[0])
-
-        n_components = PCA_NUMBER_OF_FEATURES
-        for x in range(n_components, initial_features):
-            pca = PCA(n_components=x)
-            pca.fit(cluster)
-            variances = pca.explained_variance_ratio_
-            variances = np.cumsum(variances)
-            res = list(filter(lambda i: i > 0.9, list(variances)))
-            if res:
-                n_components = x
-                pca_models.append(pca)
-                break
+    d0 = y_test[:, 0] - y[:, 0]
+    d1 = y_test[:, 1] - y[:, 1]
+    mae_t, r_t = find_accuracy(d0, y[:, 0], y_test[:, 0], "total_UPDRS")
+    mae, r = find_accuracy(d1, y[:, 1], y_test[:, 1], "motor_UPDRS")
+    print()
+    print()
 
 
-    X_training_sets = []
-    path = os.path.join("..", "reduced_datasets/datasets_")
-    np.save(path + 'y', y_train)
-    for i in range(em_number_of_clusters):
-        pca_model = pca_models[i]
-        x_train_cluster = pca_model.transform(X_train)
-        X_training_sets.append(x_train_cluster)
-        np.save(path + str(i), x_train_cluster)
 
-        print()
 
-    i = 0
-    # X_train, X_test, y_train, y_test
-    for x_train_cluster in X_training_sets:
-        # # Split dataset
 
-        model = amfis_model.AMFIS(x_train_cluster, y_train)
-        model.fit()
-        path = os.path.join("..", "reduced_datasets/predict_")
-        y = model.predict(X_test)
-        np.save(path + str(i), y)
-        i += 1
 

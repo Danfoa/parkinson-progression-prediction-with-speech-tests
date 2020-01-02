@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     # Design experiment to train model hyper-parameters:
     if EXECUTION_MODE == "SEARCH":
-        components_vec = numpy.arange(4, len(PD.FEATURES) + 1)
+        components_vec = numpy.array([6, len(PD.FEATURES)])
         results = pandas.DataFrame(
             columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
             index=components_vec)
@@ -61,8 +61,8 @@ if __name__ == '__main__':
                 X_all_transformed = X_all
             # GBR Hyper-Parameter search _____________________________________________________________________
             # Define Model, params and grid search scheme with cross validation.
-            parameters = {'learning_rate': numpy.linspace(0.0001, 0.005, 10),
-                          'max_depth': [3, 4, 5, 6]}
+            parameters = {'learning_rate': numpy.linspace(0.0001, 0.005, 5),
+                          'max_depth': [8, 10, 15]}
             gbr = GradientBoostingRegressor(loss='ls', n_estimators=20000, n_iter_no_change=10, validation_fraction=0.2)
             clf = GridSearchCV(gbr, parameters, scoring='neg_mean_absolute_error', cv=KFold(n_splits=5, shuffle=True),
                                verbose=1, n_jobs=3)

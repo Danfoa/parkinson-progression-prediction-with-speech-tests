@@ -1,7 +1,8 @@
 import itertools
 import numpy as np
 import copy
-from regression_models.anfis_packages import mfDerivs
+from regression_models.anfis_packages import mfDerivs, membershipfunction
+from skfuzzy import gaussmf
 
 
 class ANFIS:
@@ -35,7 +36,7 @@ class ANFIS:
         self.memFuncsHomo = all(len(i)==len(self.memFuncsByVariable[0]) for i in self.memFuncsByVariable)
         self.trainingType = 'Not trained yet'
 
-    def LSE(self, A, B, initialGamma = 1000.):
+    def LSE(self, A, B, initialGamma = 5000.):
         coeffMat = A
         rhsMat = B
         S = np.eye(coeffMat.shape[1])*initialGamma
@@ -47,7 +48,8 @@ class ANFIS:
             x = x + (np.dot(S,np.dot(np.matrix(a).transpose(),(np.matrix(b)-np.dot(np.matrix(a),x)))))
         return x
 
-    def trainHybridJangOffLine(self, epochs=5, tolerance=1e-5, initialGamma=1000, k=0.01):
+    # def trainHybridJangOffLine(self, epochs=5, tolerance=1e-5, initialGamma=1000, k=0.01):
+    def trainHybridJangOffLine(self, k, epochs=5, tolerance=1e-5, initialGamma=5000):
 
         self.trainingType = 'trainHybridJangOffLine'
         convergence = False
@@ -96,12 +98,12 @@ class ANFIS:
 
             eta = k / np.abs(np.sum(t))
 
-            if(np.isinf(eta)):
+            if np.isinf(eta):
                 eta = k
 
             ## handling of variables with a different number of MFs
             dAlpha = copy.deepcopy(dE_dAlpha)
-            if not(self.memFuncsHomo):
+            if not self.memFuncsHomo:
                 for x in range(len(dE_dAlpha)):
                     for y in range(len(dE_dAlpha[x])):
                         for z in range(len(dE_dAlpha[x][y])):
@@ -119,8 +121,8 @@ class ANFIS:
 
 
         self.fittedValues = predict(self,self.X)
-        self.residuals = self.Y - self.fittedValues[:,0]
-
+        # self.residuals = self.Y - self.fittedValues[:,0]
+        self.residuals = self.Y - self.fittedValues
         return self.fittedValues
 
 
@@ -136,15 +138,9 @@ class ANFIS:
 
     def plotMF(self, x, inputVar):
         import matplotlib.pyplot as plt
-        from skfuzzy import gaussmf, gbellmf, sigmf
 
         for mf in range(len(self.memFuncs[inputVar])):
-            if self.memFuncs[inputVar][mf][0] == 'gaussmf':
-                y = gaussmf(x,**self.memClass.MFList[inputVar][mf][1])
-            elif self.memFuncs[inputVar][mf][0] == 'gbellmf':
-                y = gbellmf(x,**self.memClass.MFList[inputVar][mf][1])
-            elif self.memFuncs[inputVar][mf][0] == 'sigmf':
-                y = sigmf(x,**self.memClass.MFList[inputVar][mf][1])
+            y = gaussmf(x,**self.memClass.MFList[inputVar][mf][1])
 
             plt.plot(x, y,'r')
 

@@ -133,4 +133,7 @@ if __name__ == '__main__':
     plt.savefig("../media/Recursive_Feature_Elimination_[GBR].png")
     plt.show()
 
-    results = pandas.DataFrame(columns=[""])
+    results = pandas.DataFrame(columns=["Total", "Motor"], index=range(len(nof_list)))
+    results["Motor"] = score_motor
+    results["Total"] = score_motor
+    results.to_csv("../results/outputs/GBR/RFE.csv")

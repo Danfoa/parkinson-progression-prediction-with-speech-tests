@@ -1,7 +1,7 @@
-import numpy
-import pandas
+import os
 from copy import copy
-
+import pandas
+import numpy
 from sklearn.preprocessing import MinMaxScaler
 import os
 
@@ -141,7 +141,7 @@ class ParkinsonDataset:
         return X_train, X_test, y_train, y_test
 
     @staticmethod
-    def recursive_feature_elimination(model, X, y_total, y_motor, cv=5):
+    def recursive_feature_elimination(model, X, y_total, y_motor, cv=3):
         """
         Wrapper to Recursive Feature Elimination with Cross Validation for the Parkinson Telemonitoring dataset.
         :param model: Regressor model to analyse

@@ -38,7 +38,7 @@ if __name__ == '__main__':
     # ________________________________________________________________________________________________
 
     # Design experiment to train model hyper-parameters:
-    components_vec = numpy.arange(4, len(ParkinsonDataset.FEATURES) + 1)
+    components_vec = numpy.array([6, len(ParkinsonDataset.FEATURES)])
     results = pandas.DataFrame(
         columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
         index=components_vec)
