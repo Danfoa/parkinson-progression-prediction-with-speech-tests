@@ -7,6 +7,7 @@ from sklearn.svm import SVR
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error
 from sklearn.decomposition import PCA
+from sklearn.model_selection import KFold
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     # ________________________________________________________________________________________________
 
     # Design experiment to train model hyper-parameters:
-    components_vec = numpy.arange(4, 16)
+    components_vec = numpy.arange(4, len(ParkinsonDataset.FEATURES) + 1)
     results = pandas.DataFrame(
         columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
         index=components_vec)
@@ -47,15 +48,19 @@ if __name__ == '__main__':
         pca.fit(X_all)
         # Transform dataset to new vector space
         X_all_transformed = pca.transform(X_all - X_all.mean(axis=0))
+        if n_components == len(ParkinsonDataset.FEATURES):
+            print("Original dataset")
+            X_all_transformed = X_all
         # X_train_transformed = pca.transform(X_train - X_train.mean(axis=0))
         # X_test_transformed = pca.transform(X_test - X_test.mean(axis=0))
 
         # SVR Hyper-Parameter search _____________________________________________________________________
         # Define Model, params and grid search scheme with cross validation.
-        parameters = {'C': [0.01, 0.1, 1, 10, 1e2],
-                      'gamma': [0.01, 0.1, 1, 5, 10, 50]}
+        parameters = {'C': [0.01, 0.1, 1, 10, 1e2, 1e3],
+                      'gamma': [0.01, 0.1, 1, 5, 10, 100, 500]}
         svr = SVR(kernel='rbf')
-        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=5, verbose=1, n_jobs=3)
+        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=KFold(n_splits=5, shuffle=True),
+                           verbose=1, n_jobs=2)
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
             print("num-PCs=%d Training %s on %s" % (n_components, model, y_type))

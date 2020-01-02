@@ -130,46 +130,7 @@ if __name__ == '__main__':
     plt.xlabel("Size of feature set")
     plt.grid()
     plt.legend()
+    plt.savefig("../media/Recursive_Feature_Elimination_[GBR].png")
     plt.show()
 
-    # all_feature_masks, all_mae_log = PD.recursive_feature_elimination(model=gbr_motor, X=X_all,
-    #                                                                   y_total=y_all_total,
-    #                                                                   y_motor=y_all_motor, cv=5)
-    # print("[All] Total features: %s" % numpy.array(PD.FEATURES)[all_feature_masks['Total']])
-    # print("[All] Motor features: %s" % numpy.array(PD.FEATURES)[all_feature_masks['Motor']])
-    #
-    # X_males = df_males[PD.FEATURES].values
-    # y_total = df_males[PD.TOTAL_UPDRS].values
-    # y_motor = df_males[PD.MOTOR_UPDRS].values
-    # male_feature_masks, male_mae_log = PD.recursive_feature_elimination(model=gbr_motor, X=X_males,
-    #                                                                     y_total=y_total,
-    #                                                                     y_motor=y_motor, cv=5)
-    # print("[Male] Total features: %s" % numpy.array(PD.FEATURES)[male_feature_masks['Total']])
-    # print("[Male] Motor features: %s" % numpy.array(PD.FEATURES)[male_feature_masks['Motor']])
-    #
-    # X_females = df_females[PD.FEATURES].values
-    # y_total = df_females[PD.TOTAL_UPDRS].values
-    # y_motor = df_females[PD.MOTOR_UPDRS].values
-    # female_feature_masks, female_mae_log = PD.recursive_feature_elimination(model=gbr_motor, X=X_females,
-    #                                                                         y_total=y_total,
-    #                                                                         y_motor=y_motor, cv=5)
-    #
-    # print("[Female] Total features: %s" % numpy.array(PD.FEATURES)[female_feature_masks['Total']])
-    # print("[Female] Motor features: %s" % numpy.array(PD.FEATURES)[female_feature_masks['Motor']])
-    #
-    # plt.figure()
-    # x_log = range(1, len(all_mae_log['Total']) + 1)
-    # plt.plot(x_log, all_mae_log['Total'], label="Total UPDRS")
-    # plt.plot(x_log, all_mae_log['Motor'], label="Motor UPDRS")
-    # plt.plot(x_log, male_mae_log['Total'], label="Total UPDRS [M]")
-    # plt.plot(x_log, male_mae_log['Motor'], label="Motor UPDRS [M]")
-    # plt.plot(x_log, female_mae_log['Total'], label="Total UPDRS [F]")
-    # plt.plot(x_log, female_mae_log['Motor'], label="Motor UPDRS [F]")
-    # title = "Recursive Feature Elimination [%s]" % model_name
-    # plt.title(title)
-    # plt.xlabel("Number of selected features")
-    # plt.ylabel("Cross validated average MAE")
-    # plt.legend()
-    # plt.tight_layout()
-    # plt.savefig("../media/" + title.replace(" ", "_") + ".png")
-    # plt.show()
+    results = pandas.DataFrame(columns=[""])
