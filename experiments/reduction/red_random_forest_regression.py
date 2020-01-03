@@ -5,66 +5,77 @@ import numpy
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
-
+from sklearn.model_selection import cross_val_score
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
+from sklearn.model_selection import KFold
 
 if __name__ == '__main__':
-    model = "RFR_Reduced_Dataset"
+    model_name = "RFR_Reduced_Dataset"
     load_path = "../../results/reduction/"
     save_path = "../../results/outputs/"
 
+    # clustering algorithms to test
     clustering_algorithms = ["fuzzy_c_means", "som", "em"]
-    clusters = [[4, 5], [9], [12]]
+    # Number of algorithm_clusters to test in each algorithm
+    algorithm_clusters = [5, 9, 12]
 
     df = ParkinsonDataset.load_dataset(path="../dataset/parkinsons_updrs.data",
                                        return_gender=False)
     # Normalizing/scaling  dataset
     feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=StandardScaler(),
+                                                             scaler=MinMaxScaler(),
                                                              inplace=True)
+    X_all = df[ParkinsonDataset.FEATURES].values
+    y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
+    y_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
 
-    y_all_total = df[ParkinsonDataset.TOTAL_UPDRS].values
-    y_all_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
+    results = pandas.DataFrame(columns=['Total-Test', 'Motor-Test'],
+                               index=clustering_algorithms)
 
-    for i in range(len(clustering_algorithms)):
-        algorithm = clustering_algorithms[i]
-        for c in clusters[i]:
-            # Design experiment to train model hyper-parameters:
-            clusters_vec = numpy.arange(0, c)
-            results = pandas.DataFrame(
-                columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
-                index=clusters_vec)
+    # Create cross-validation partition
+    for algorithm, num_clusters in zip(clustering_algorithms, algorithm_clusters):
 
-            for k in range(c):
-                X = numpy.load(load_path + algorithm + '/C=%d-K=%d-reduced-dataset.npy' % (c, k))
+        # Create CV loop, providing indexes of training and testing
+        total_results, motor_results = [], []
+        cv_splitter = KFold(n_splits=5, shuffle=True)
+        for train_index, test_index in cv_splitter.split(X_all):
+            # Get ground truth
+            y_total_train, y_total_test = y_total[train_index], y_total[test_index]
+            y_motor_train, y_motor_test = y_motor[train_index], y_motor[test_index]
 
-                # Use for evaluation selected model
-                X_train, X_test, y_train, y_test = ParkinsonDataset.split_reduced_dataset(X=X, dataset=df,
-                                                                                    subject_partitioning=False)
-                # Get TOTAL UPDRS targets
-                y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
-                # Get MOTOR UPDRS targets
-                y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
-                # ________________________________________________________________________________________________
+            # Allocate matrix for predictions
+            y_pred_total_clusters = numpy.ones((num_clusters, len(test_index)))
+            y_pred_motor_clusters = numpy.ones((num_clusters, len(test_index)))
+            # Iterate through each of the projected data-sets and predict a result
+            for cluster in range(num_clusters):
+                X_projected = numpy.load(load_path + algorithm + '/C=%d-K=%d-reduced-dataset.npy' % (num_clusters,
+                                                                                                     cluster))
+                X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
                 # RFR
-                svr = RandomForestRegressor(criterion='mae', n_estimators=200)
+                model = RandomForestRegressor(criterion='mae', n_estimators=200)
 
-                # Train two models, one for each target
-                for y_target_train, y_target_test, y_type in zip([y_train_total, y_train_motor], [y_test_total, y_test_motor],
-                                                                 ['Total', 'Motor']):
-                    print("algorithm=%s C=%d K=%d Training %s on %s" % (algorithm, c, k, model, y_type))
-                    # Perform grid search
-                    svr.fit(X_train, y_target_train)
+                # Total __________________________________________________
+                model.fit(X_train, y_total_train)
+                y_pred_total_clusters[cluster, :] = model.predict(X_test)
+                # Motor __________________________________________________
+                model.fit(X_train, y_motor_train)
+                y_pred_motor_clusters[cluster, :] = model.predict(X_test)
 
-                    # Save results for later processing/analysis ==============================================
-                    y_pred = svr.predict(X_test)
+            # TODO: Evaluate other ensembling techniques
+            y_ensembled_total = y_pred_total_clusters.sum(axis=0) / num_clusters
+            y_ensembled_motor = y_pred_motor_clusters.sum(axis=0) / num_clusters
+            # Get results from current fold
+            fold_total_MAE = mean_absolute_error(y_true=y_total_test, y_pred=y_ensembled_total)
+            fold_motor_MAE = mean_absolute_error(y_true=y_motor_test, y_pred=y_ensembled_motor)
+            # Save fold value
+            total_results.append(fold_total_MAE)
+            motor_results.append(fold_motor_MAE)
 
-                    results.at[k, y_type + '-Test'] = mean_absolute_error(y_pred, y_target_test)
-                    results.at[k, y_type + '-Params'] = svr.get_params()
-                    print(results)
+        results.at[algorithm, "Total-Test"] = total_results
+        results.at[algorithm, "Motor-Test"] = motor_results
+        print(results)
+    results.to_csv(save_path + "[%s]clustering+regression_results.csv" % model_name)
 
-            results.to_csv(save_path + model + "/" + algorithm + '/MAE-C=%d-diff-k.csv' %c)
-            print(results)
 
