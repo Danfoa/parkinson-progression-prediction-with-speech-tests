@@ -40,7 +40,8 @@ class AMFIS:
         minvals = np.min(self.data, axis=0)
 
         maxvals = np.max(self.data, axis=0)
-        ranges = np.abs(maxvals) - np.abs(minvals)
+        # ranges = np.abs(maxvals) - np.abs(minvals)
+        ranges = np.absolute(maxvals - minvals)
         invars = []
         for i in range(self.num_invars):
             sigma = ranges[i] / num_mfs
