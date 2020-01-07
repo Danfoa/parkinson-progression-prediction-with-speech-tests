@@ -82,7 +82,6 @@ if __name__ == '__main__':
                 y_pred_total_clusters[cluster, :] = y_pred[:, 0]
                 y_pred_motor_clusters[cluster, :] = y_pred[:, 1]
 
-            # TODO: Evaluate other ensembling techniques
             y_ensembled_total = y_pred_total_clusters.sum(axis=0) / num_clusters
             y_ensembled_motor = y_pred_motor_clusters.sum(axis=0) / num_clusters
             # Get results from current fold

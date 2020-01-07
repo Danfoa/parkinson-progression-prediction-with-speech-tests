@@ -83,12 +83,11 @@ if __name__ == '__main__':
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
     y_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
 
+    results = pandas.DataFrame(columns=['Total-Test', 'Motor-Test'],
+                               index=clustering_algorithms)
+
     # Create cross-validation partition
     for algorithm, num_clusters in zip(clustering_algorithms, algorithm_clusters):
-        print(algorithm)
-        results = pandas.DataFrame(columns=['Total-Test', 'Motor-Test'],
-                                   index=clustering_algorithms)
-
         # Create CV loop, providing indexes of training and testing
         total_results, motor_results = [], []
         cv_splitter = KFold(n_splits=5, shuffle=True)

@@ -62,7 +62,6 @@ if __name__ == '__main__':
                 model.fit(X_train, y_motor_train)
                 y_pred_motor_clusters[cluster, :] = model.predict(X_test)
 
-            # TODO: Evaluate other ensembling techniques
             y_ensembled_total = y_pred_total_clusters.sum(axis=0) / num_clusters
             y_ensembled_motor = y_pred_motor_clusters.sum(axis=0) / num_clusters
             # Get results from current fold

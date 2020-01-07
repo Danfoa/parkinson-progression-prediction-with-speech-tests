@@ -1,23 +1,16 @@
-import pandas
-import numpy
 import matplotlib.pyplot as plt
-
-# Sklearn imports
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+import numpy
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import mean_absolute_error
-from sklearn.decomposition import PCA
+# Sklearn imports
+from sklearn.preprocessing import MinMaxScaler
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset as PD
-from utils.visualizer import *
-from sklearn.model_selection import KFold
 
 if __name__ == '__main__':
     model_name = "GBR"
     # Example of loading the dataset _________________________________________________________________
-    df, ids, df_males, df_females = PD.load_dataset(path="dataset/parkinsons_updrs.data", return_gender=True)
+    df, ids, df_males, df_females = PD.load_dataset(path="../dataset/parkinsons_updrs.data", return_gender=True)
     PD.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
     PD.normalize_dataset(dataset=df_females, scaler=MinMaxScaler(), inplace=True)
     PD.normalize_dataset(dataset=df_males, scaler=MinMaxScaler(), inplace=True)
@@ -27,17 +20,10 @@ if __name__ == '__main__':
                                                scaler=MinMaxScaler(),
                                                inplace=True)
     # Split dataset
-    # Used in model cross-validated hyper-parameter search
     X_all = df[PD.FEATURES].values
     y_all_total = df[PD.TOTAL_UPDRS].values
     y_all_motor = df[PD.MOTOR_UPDRS].values
-    # Use for evaluation selected model
-    X_train, X_test, y_train, y_test = PD.split_dataset(dataset=df,
-                                                        subject_partitioning=False)
-    # Get TOTAL UPDRS targets
-    y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
-    # Get MOTOR UPDRS targets
-    y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
+
     # _____________________________________________________________________________________________________
     # Experiment on Recursive feature elimination
     params = {'n_iter_no_change': 10,
@@ -84,5 +70,5 @@ if __name__ == '__main__':
     plt.ylabel("Cross validated average MAE")
     plt.legend()
     plt.tight_layout()
-    plt.savefig("../media/rfe/" + title.replace(" ", "_") + ".png")
+    plt.savefig("../../media/rfe/" + title.replace(" ", "_") + ".png")
     plt.show()

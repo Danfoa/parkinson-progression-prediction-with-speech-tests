@@ -13,15 +13,11 @@ from utils.dataset_loader import ParkinsonDataset as PD
 if __name__ == '__main__':
     model_name = "GBR"
     # Example of loading the dataset _________________________________________________________________
-    df, ids, df_males, df_females = PD.load_dataset(path="dataset/parkinsons_updrs.data", return_gender=True)
-    PD.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
-    PD.normalize_dataset(dataset=df_females, scaler=MinMaxScaler(), inplace=True)
-    PD.normalize_dataset(dataset=df_males, scaler=MinMaxScaler(), inplace=True)
+    df = PD.load_dataset(path="../dataset/parkinsons_updrs.data", return_gender=False)
 
     # Normalizing/scaling  dataset
-    feature_normalizers = PD.normalize_dataset(dataset=df,
-                                               scaler=MinMaxScaler(),
-                                               inplace=True)
+    PD.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
+
     # Split dataset
     # Used in model cross-validated hyper-parameter search
     X_all = df[PD.FEATURES].values
@@ -69,5 +65,5 @@ if __name__ == '__main__':
             results.at[n_components, y_type + '-Params'] = clf.best_params_
             svr_model = clf.best_estimator_
             print(results)
-    results.to_csv("../results/outputs/%s/MAE-diff-components.csv" % model_name)
-print(results)
+    results.to_csv("../../results/outputs/%s/MAE-diff-components.csv" % model_name)
+    print(results)

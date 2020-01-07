@@ -14,28 +14,17 @@ from utils.dataset_loader import ParkinsonDataset
 if __name__ == '__main__':
     model_name = "RFR"
     # Example of loading the dataset _________________________________________________________________
-    df, ids, df_males, df_females = ParkinsonDataset.load_dataset(path="dataset/parkinsons_updrs.data",
+    df, ids, df_males, df_females = ParkinsonDataset.load_dataset(path="../dataset/parkinsons_updrs.data",
                                                                   return_gender=True)
-    ParkinsonDataset.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
-    ParkinsonDataset.normalize_dataset(dataset=df_females, scaler=MinMaxScaler(), inplace=True)
-    ParkinsonDataset.normalize_dataset(dataset=df_males, scaler=MinMaxScaler(), inplace=True)
 
     # Normalizing/scaling  dataset
-    feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=MinMaxScaler(),
-                                                             inplace=True)
+    ParkinsonDataset.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
+
     # Split dataset
-    # Used in model cross-validated hyper-parameter search
     X_all = df[ParkinsonDataset.FEATURES].values
     y_all_total = df[ParkinsonDataset.TOTAL_UPDRS].values
     y_all_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
-    # Use for evaluation selected model
-    X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df,
-                                                                      subject_partitioning=False)
-    # Get TOTAL UPDRS targets
-    y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
-    # Get MOTOR UPDRS targets
-    y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
+
     # ________________________________________________________________________________________________
     # Experiment on Recursive feature elimination
     params = {'n_estimators': 500}
@@ -80,5 +69,5 @@ if __name__ == '__main__':
     plt.ylabel("Cross validated average MAE")
     plt.legend()
     plt.tight_layout()
-    plt.savefig("../media/rfe/" + title.replace(" ", "_") + ".png")
+    plt.savefig("../../media/rfe/" + title.replace(" ", "_") + ".png")
     plt.show()
