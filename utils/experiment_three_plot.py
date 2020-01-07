@@ -60,7 +60,7 @@ seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1)
 
 seaborn.despine(fig)
 plt.title("SOM clustering results")
-plt.savefig("../media/clustering_som_all_models_male.png")
+plt.savefig("../media/clustering_som_all_models.png")
 plt.show()
 
 df = pandas.DataFrame({
@@ -73,5 +73,5 @@ tidy = df.melt(id_vars='Models').rename(columns=str.title)
 seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1)
 seaborn.despine(fig)
 plt.title("EM clustering results")
-plt.savefig("../media/clustering_em_all_models_female.png")
+plt.savefig("../media/clustering_em_all_models.png")
 plt.show()
