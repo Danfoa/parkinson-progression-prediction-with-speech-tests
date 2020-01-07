@@ -3,6 +3,7 @@ import numpy as np
 import copy
 from regression_models.anfis_packages import mfDerivs, membershipfunction
 from skfuzzy import gaussmf
+from joblib import Parallel, delayed
 
 
 class ANFIS:
@@ -56,19 +57,19 @@ class ANFIS:
         epoch = 1
 
         while (epoch < epochs) and (convergence is not True):
-
+            print("Start epoch={}".format(epoch))
             #layer four: forward pass
             [layerFour, wSum, w] = forwardHalfPass(self, self.X)
 
             #layer five: least squares estimate
             layerFive = np.array(self.LSE(layerFour,self.Y,initialGamma))
             self.consequents = layerFive
-            layerFive = np.dot(layerFour,layerFive)
+            layerFive = np.dot(layerFour, layerFive)
 
             #error
             error = np.sum((self.Y.T-layerFive.T)**2)
             print('current error: '+ str(error))
-            average_error = np.average(np.absolute(self.Y.T-layerFive.T))
+            # average_error = np.average(np.absolute(self.Y.T-layerFive.T))
             self.errors = np.append(self.errors,error)
 
             if len(self.errors) != 0:
@@ -78,8 +79,8 @@ class ANFIS:
             # back propagation
             if convergence is not True:
                 cols = range(len(self.X[0,:]))
-                dE_dAlpha = list(backprop(self, colX, cols, wSum, w, layerFive) for colX in range(self.X.shape[1]))
-
+                dE_dAlpha = Parallel(n_jobs=len(cols))(delayed(backprop)
+                                                       (self, colX, cols, wSum, w, layerFive) for colX in range(self.X.shape[1]))
 
             if len(self.errors) >= 4:
                 if (self.errors[-4] > self.errors[-3] > self.errors[-2] > self.errors[-1]):
@@ -176,10 +177,10 @@ def forwardHalfPass(ANFISObj, Xs):
 
         #layer three
         wSum.append(np.sum(layerTwo))
-        if pattern == 0:
-            wNormalized = layerTwo/wSum[pattern]
-        else:
-            wNormalized = np.vstack((wNormalized,layerTwo/wSum[pattern]))
+        # if pattern == 0:
+        #     wNormalized = layerTwo/wSum[pattern]
+        # else:
+        #     wNormalized = np.vstack((wNormalized,layerTwo/wSum[pattern]))
 
         #prep for layer four (bit of a hack)
         layerThree = layerTwo/wSum[pattern]
@@ -187,7 +188,7 @@ def forwardHalfPass(ANFISObj, Xs):
         layerFour = np.append(layerFour,rowHolder)
 
     w = w.T
-    wNormalized = wNormalized.T
+    # wNormalized = wNormalized.T
 
     layerFour = np.array(np.array_split(layerFour,pattern + 1))
 
@@ -195,15 +196,17 @@ def forwardHalfPass(ANFISObj, Xs):
 
 
 def backprop(ANFISObj, columnX, columns, theWSum, theW, theLayerFive):
-
+    print("Start backpropagation.....")
     paramGrp = [0]* len(ANFISObj.memFuncs[columnX])
+    # MF = {0, 1} for mean and sigma
     for MF in range(len(ANFISObj.memFuncs[columnX])):
 
         parameters = np.empty(len(ANFISObj.memFuncs[columnX][MF][1]))
         timesThru = 0
-        for alpha in sorted(ANFISObj.memFuncs[columnX][MF][1].keys()):
-
+         # alpha = mean and sigma
+        for alpha in ANFISObj.memFuncs[columnX][MF][1].keys():
             bucket3 = np.empty(len(ANFISObj.X))
+            # len is X rows
             for rowX in range(len(ANFISObj.X)):
                 varToTest = ANFISObj.X[rowX,columnX]
                 tmpRow = np.empty(len(ANFISObj.memFuncs))
@@ -245,12 +248,12 @@ def backprop(ANFISObj, columnX, columns, theWSum, theW, theLayerFive):
             timesThru = timesThru + 1
 
         paramGrp[MF] = parameters
-
+    print("Ending backpropagation.....")
     return paramGrp
 
 
 def predict(ANFISObj, varsToTest):
-
+    print("Error checking....")
     [layerFour, wSum, w] = forwardHalfPass(ANFISObj, varsToTest)
 
     #layer five

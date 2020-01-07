@@ -5,7 +5,7 @@ from regression_models.anfis_packages import membershipfunction
 from regression_models.anfis_packages.anfis import ANFIS
 
 
-class AMFIS:
+class MyANFIS:
     def __init__(self, data, y):
         self.data = data
         self.y = y
@@ -14,7 +14,6 @@ class AMFIS:
         mf = self.create_gauss_mfs(data)
         self.mfc = membershipfunction.MemFuncs(mf)
         self.anf = None
-
 
     def fit(self, k, gamma):
         self.anf = ANFIS(self.data, self.y, self.mfc)
@@ -40,7 +39,8 @@ class AMFIS:
         minvals = np.min(self.data, axis=0)
 
         maxvals = np.max(self.data, axis=0)
-        ranges = np.abs(maxvals) - np.abs(minvals)
+        # ranges = np.abs(maxvals) - np.abs(minvals)
+        ranges = np.absolute(maxvals - minvals)
         invars = []
         for i in range(self.num_invars):
             sigma = ranges[i] / num_mfs

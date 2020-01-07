@@ -9,7 +9,6 @@ style.use('fivethirtyeight')
 import os
 
 
-
 class ExpectationMaximization:
 
     def __init__(self, data):
@@ -17,7 +16,7 @@ class ExpectationMaximization:
         self.model = None
         self.transformed_input = None
 
-    def fit_tranform(self, best_n_components=12):
+    def fit_tranform(self, best_n_components=None):
         n_components = np.arange(1, 21)
         models = [GaussianMixture(n, covariance_type='full', max_iter=400)
                       .fit(self.data) for n in n_components]
@@ -34,7 +33,7 @@ class ExpectationMaximization:
 
         plt.legend(loc='best')
         plt.xlabel('n_components')
-        path = os.path.join('..', 'results/clustering/em//EM_BIC_AIC.png')
+        path = os.path.join('..', 'media/clustering/em/EM_BIC_AIC.png')
         plt.savefig(path)
         plt.close()
 
