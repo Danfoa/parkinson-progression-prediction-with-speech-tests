@@ -29,14 +29,15 @@ def readValues(path):
     return result
 
 
-values = [readValues("../results/outputs/GBR/MAE-final-GBR-KFold.csv"),
-          readValues("../results/outputs/MLP/MAE-final-MLP-KFold.csv"),
-          readValues("../results/outputs/RFR/MAE-final-RFR-KFold.csv"),
-          readValues("../results/outputs/SVR/MAE-final-SVR-KFold.csv")]
+values = [readValues("../results/outputs/ANFIS/MAE-clustering+regression_results.csv"),
+          readValues("../results/outputs/GBR/MAE-clustering+regression_results.csv"),
+    #      readValues("../results/outputs/MLP/MAE-clustering+regression_results.csv"),
+          readValues("../results/outputs/RFR/MAE-clustering+regression_results.csv"),
+          readValues("../results/outputs/SVR/MAE-clustering+regression_results.csv")]
 values = list(map(list, zip(*values)))
 
 df = pandas.DataFrame({
-    'Models': ["GBR", "MLP", "RFR", "SVR"],
+    'Models': ["ANFIS","GBR", "RFR", "SVR"],
     'Total_UPDRS': values[0],
     'Motor_UPDRS': values[1]
 })
@@ -44,32 +45,33 @@ fig, ax1 = plt.subplots(figsize=(10, 10))
 tidy = df.melt(id_vars='Models').rename(columns=str.title)
 seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1)
 seaborn.despine(fig)
-#plt.title("")
-plt.savefig("../media/Ensembling_experiment_all_models.png")
+plt.title("Fuzzy-c-means clustering results")
+plt.savefig("../media/clustering_fuzzy_c_means_all_models.png")
 plt.show()
 
 df = pandas.DataFrame({
-    'Models': ["GBR", "MLP", "RFR", "SVR"],
-    'Total_UPDRS_male': values[2],
-    'Motor_UPDRS_male': values[3]
+    'Models': ["ANFIS","GBR", "RFR", "SVR"],
+    'Total_UPDRS': values[2],
+    'Motor_UPDRS': values[3]
+})
+fig, ax1 = plt.subplots(figsize=(10, 10))
+tidy = df.melt(id_vars='Models').rename(columns=str.title)
+seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1)
+
+seaborn.despine(fig)
+plt.title("SOM clustering results")
+plt.savefig("../media/clustering_som_all_models_male.png")
+plt.show()
+
+df = pandas.DataFrame({
+    'Models': ["ANFIS", "GBR", "RFR", "SVR"],
+    'Total_UPDRS': values[4],
+    'Motor_UPDRS': values[5]
 })
 fig, ax1 = plt.subplots(figsize=(10, 10))
 tidy = df.melt(id_vars='Models').rename(columns=str.title)
 seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1)
 seaborn.despine(fig)
-#plt.title("")
-plt.savefig("../media/Ensembling_experiment_all_models_male.png")
-plt.show()
-
-df = pandas.DataFrame({
-    'Models': ["GBR", "MLP", "RFR", "SVR"],
-    'Total_UPDRS_female': values[4],
-    'Motor_UPDRS_female': values[5]
-})
-fig, ax1 = plt.subplots(figsize=(10, 10))
-tidy = df.melt(id_vars='Models').rename(columns=str.title)
-seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1)
-seaborn.despine(fig)
-#plt.title("")
-plt.savefig("../media/Ensembling_experiment_all_models_female.png")
+plt.title("EM clustering results")
+plt.savefig("../media/clustering_em_all_models_female.png")
 plt.show()
