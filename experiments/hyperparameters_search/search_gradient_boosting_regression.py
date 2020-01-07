@@ -1,35 +1,35 @@
-import pandas
 import numpy
-
-# Sklearn imports
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-from sklearn.svm import SVR
-from sklearn.model_selection import GridSearchCV
-from sklearn.metrics import mean_absolute_error
+import pandas
 from sklearn.decomposition import PCA
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import KFold
+# Sklearn imports
+from sklearn.preprocessing import MinMaxScaler
 
 # Custom imports
-from utils.dataset_loader import ParkinsonDataset
-from utils.visualizer import *
+from utils.dataset_loader import ParkinsonDataset as PD
 
 if __name__ == '__main__':
-    model = "SVR"
+    model_name = "GBR"
     # Example of loading the dataset _________________________________________________________________
-    df = ParkinsonDataset.load_dataset(path="dataset/parkinsons_updrs.data",
-                                       return_gender=False)
+    df, ids, df_males, df_females = PD.load_dataset(path="dataset/parkinsons_updrs.data", return_gender=True)
+    PD.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
+    PD.normalize_dataset(dataset=df_females, scaler=MinMaxScaler(), inplace=True)
+    PD.normalize_dataset(dataset=df_males, scaler=MinMaxScaler(), inplace=True)
+
     # Normalizing/scaling  dataset
-    feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=StandardScaler(),
-                                                             inplace=True)
+    feature_normalizers = PD.normalize_dataset(dataset=df,
+                                               scaler=MinMaxScaler(),
+                                               inplace=True)
     # Split dataset
     # Used in model cross-validated hyper-parameter search
-    X_all = df[ParkinsonDataset.FEATURES].values
-    y_all_total = df[ParkinsonDataset.TOTAL_UPDRS].values
-    y_all_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
+    X_all = df[PD.FEATURES].values
+    y_all_total = df[PD.TOTAL_UPDRS].values
+    y_all_motor = df[PD.MOTOR_UPDRS].values
     # Use for evaluation selected model
-    X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df,
-                                                                      subject_partitioning=False)
+    X_train, X_test, y_train, y_test = PD.split_dataset(dataset=df,
+                                                        subject_partitioning=False)
     # Get TOTAL UPDRS targets
     y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
     # Get MOTOR UPDRS targets
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # ________________________________________________________________________________________________
 
     # Design experiment to train model hyper-parameters:
-    components_vec = numpy.array([6, len(ParkinsonDataset.FEATURES)])
+    components_vec = numpy.array([6, len(PD.FEATURES)])
     results = pandas.DataFrame(
         columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
         index=components_vec)
@@ -48,31 +48,26 @@ if __name__ == '__main__':
         pca.fit(X_all)
         # Transform dataset to new vector space
         X_all_transformed = pca.transform(X_all - X_all.mean(axis=0))
-        if n_components == len(ParkinsonDataset.FEATURES):
+        if n_components == len(PD.FEATURES):
             print("Original dataset")
             X_all_transformed = X_all
-        # X_train_transformed = pca.transform(X_train - X_train.mean(axis=0))
-        # X_test_transformed = pca.transform(X_test - X_test.mean(axis=0))
-
-        # SVR Hyper-Parameter search _____________________________________________________________________
+        # GBR Hyper-Parameter search _____________________________________________________________________
         # Define Model, params and grid search scheme with cross validation.
-        parameters = {'C': [0.01, 0.1, 1, 10, 1e2, 1e3],
-                      'gamma': [0.01, 0.1, 1, 5, 10, 100, 500]}
-        svr = SVR(kernel='rbf')
-        clf = GridSearchCV(svr, parameters, scoring='neg_mean_absolute_error', cv=KFold(n_splits=5, shuffle=True),
-                           verbose=1, n_jobs=2)
+        parameters = {'learning_rate': numpy.linspace(0.0001, 0.005, 5),
+                      'max_depth': [8, 10, 15]}
+        gbr = GradientBoostingRegressor(loss='ls', n_estimators=20000, n_iter_no_change=10, validation_fraction=0.2)
+        clf = GridSearchCV(gbr, parameters, scoring='neg_mean_absolute_error', cv=KFold(n_splits=5, shuffle=True),
+                           verbose=1, n_jobs=3)
         # Train two models, one for each target
         for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
-            print("num-PCs=%d Training %s on %s" % (n_components, model, y_type))
+            print("num-PCs=%d Training %s on %s" % (n_components, model_name, y_type))
             # Perform grid search
             clf.fit(X_all_transformed, y_target)
-
             # Save results for later processing/analysis ==============================================
             results.at[n_components, y_type + '-Test'] = clf.cv_results_['mean_test_score'][clf.best_index_]
             # results.at[n_components, y_type + '-Train'] = clf.cv_results_['mean_train_score'][clf.best_index_]
             results.at[n_components, y_type + '-Params'] = clf.best_params_
             svr_model = clf.best_estimator_
             print(results)
-    results.to_csv("../results/outputs/%s/MAE-diff-components.csv" % model)
-    print(results)
-
+    results.to_csv("../results/outputs/%s/MAE-diff-components.csv" % model_name)
+print(results)

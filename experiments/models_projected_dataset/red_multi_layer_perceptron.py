@@ -1,18 +1,18 @@
-import pandas
 import numpy
-
-
-# Sklearn imports
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-from sklearn.ensemble import GradientBoostingRegressor
+import pandas
+import tensorflow as tf
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import KFold
+# Sklearn imports
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow import keras
+from tensorflow.keras import layers
+
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
-from sklearn.model_selection import KFold
 
 if __name__ == '__main__':
-    model_name = "GBR_Reduced_Dataset"
+    model_name = "MLP"
     load_path = "../../results/reduction/"
     save_path = "../../results/outputs/"
 
@@ -28,6 +28,7 @@ if __name__ == '__main__':
                                                              scaler=MinMaxScaler(),
                                                              inplace=True)
     X_all = df[ParkinsonDataset.FEATURES].values
+    y_all = df[[ParkinsonDataset.TOTAL_UPDRS, ParkinsonDataset.MOTOR_UPDRS]].values
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
     y_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
 
@@ -41,8 +42,9 @@ if __name__ == '__main__':
         cv_splitter = KFold(n_splits=5, shuffle=True)
         for train_index, test_index in cv_splitter.split(X_all):
             # Get ground truth
-            y_total_train, y_total_test = y_total[train_index], y_total[test_index]
-            y_motor_train, y_motor_test = y_motor[train_index], y_motor[test_index]
+            y_train = y_all[train_index]
+            y_total_test = y_total[test_index]
+            y_motor_test = y_motor[test_index]
 
             # Allocate matrix for predictions
             y_pred_total_clusters = numpy.ones((num_clusters, len(test_index)))
@@ -53,17 +55,32 @@ if __name__ == '__main__':
                                                                                                      cluster))
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
-                params = {'n_iter_no_change': 10,
-                          'validation_fraction': 0.2,
-                          'n_estimators': 10000}
-                model = GradientBoostingRegressor(learning_rate=0.0042, max_depth=10, **params)
+                hidden_units = [500, 400, 300, 200]
+                activation = 'sigmoid'
+                lr = 0.0005
 
-                # Total __________________________________________________
-                model.fit(X_train, y_total_train)
-                y_pred_total_clusters[cluster, :] = model.predict(X_test)
-                # Motor __________________________________________________
-                model.fit(X_train, y_motor_train)
-                y_pred_motor_clusters[cluster, :] = model.predict(X_test)
+                model = keras.Sequential()
+                for layer in range(len(hidden_units)):
+                    model.add(layers.Dense(units=hidden_units[layer], activation=activation))
+                # 2 units in the output layer (Total and Motor)
+                model.add(layers.Dense(units=2))
+                optimizer = tf.keras.optimizers.Adam(lr)
+                model.compile(loss='mse',
+                              optimizer=optimizer,
+                              metrics=['mae', 'mse'])
+
+                history = model.fit(x=X_train,
+                                    y=y_train,
+                                    epochs=1000,
+                                    validation_split=0.1,
+                                    shuffle=True,
+                                    verbose=0,
+                                    callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)])
+
+                y_pred = model.predict(X_test)
+
+                y_pred_total_clusters[cluster, :] = y_pred[:, 0]
+                y_pred_motor_clusters[cluster, :] = y_pred[:, 1]
 
             # TODO: Evaluate other ensembling techniques
             y_ensembled_total = y_pred_total_clusters.sum(axis=0) / num_clusters
@@ -78,6 +95,4 @@ if __name__ == '__main__':
         results.at[algorithm, "Total-Test"] = total_results
         results.at[algorithm, "Motor-Test"] = motor_results
         print(results)
-    results.to_csv(save_path + "[%s]clustering+regression_results.csv" % model_name)
-
-
+    results.to_csv(save_path + "%s/MAE-clustering+regression_results.csv" % model_name)

@@ -1,6 +1,6 @@
 ,Total-Test,Total-Params,Motor-Test,Motor-Params
-1,5.620129423791764,"{'activation': 'sigmoid', 'lr': 0.06670000000000001}",4.325980477837745,"{'activation': 'sigmoid', 'lr': 0.055600000000000004}"
-2,5.581051337441302,"{'activation': 'relu', 'lr': 0.0001}",4.199023478761714,"{'activation': 'relu', 'lr': 0.0001}"
-3,4.413216663557337,"{'activation': 'relu', 'lr': 0.0001}",3.4847776721048556,"{'activation': 'relu', 'lr': 0.0001}"
-4,4.2200593429032995,"{'activation': 'relu', 'lr': 0.0001}",3.424691194554106,"{'activation': 'relu', 'lr': 0.0001}"
-5,4.205160672826889,"{'activation': 'relu', 'lr': 0.0001}",3.3826213180269282,"{'activation': 'relu', 'lr': 0.0001}"
+1,4.740411694962522,"{'activation': 'sigmoid', 'lr': 0.0112}",3.7800209898577752,"{'activation': 'sigmoid', 'lr': 0.0223}"
+2,3.7385995178472635,"{'activation': 'relu', 'lr': 0.0001}",2.9279781769571507,"{'activation': 'relu', 'lr': 0.0001}"
+3,3.3443403243583516,"{'activation': 'relu', 'lr': 0.0001}",2.68298494288408,"{'activation': 'relu', 'lr': 0.0001}"
+4,3.1614949982669907,"{'activation': 'relu', 'lr': 0.0001}",2.553737311657195,"{'activation': 'relu', 'lr': 0.0001}"
+5,3.310041980127862,"{'activation': 'relu', 'lr': 0.0001}",2.699478567673054,"{'activation': 'relu', 'lr': 0.0001}"

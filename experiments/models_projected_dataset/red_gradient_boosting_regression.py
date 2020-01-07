@@ -1,9 +1,10 @@
 import pandas
 import numpy
 
+
 # Sklearn imports
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-from sklearn.svm import SVR
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import cross_val_score
 # Custom imports
@@ -11,7 +12,7 @@ from utils.dataset_loader import ParkinsonDataset
 from sklearn.model_selection import KFold
 
 if __name__ == '__main__':
-    model_name = "SVR_Reduced_Dataset"
+    model_name = "GBR"
     load_path = "../../results/reduction/"
     save_path = "../../results/outputs/"
 
@@ -52,8 +53,10 @@ if __name__ == '__main__':
                                                                                                      cluster))
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
-                # SVR
-                model = SVR(kernel='rbf', C=10, gamma=1)
+                params = {'n_iter_no_change': 10,
+                          'validation_fraction': 0.2,
+                          'n_estimators': 10000}
+                model = GradientBoostingRegressor(learning_rate=0.0042, max_depth=10, **params)
 
                 # Total __________________________________________________
                 model.fit(X_train, y_total_train)
@@ -75,6 +78,6 @@ if __name__ == '__main__':
         results.at[algorithm, "Total-Test"] = total_results
         results.at[algorithm, "Motor-Test"] = motor_results
         print(results)
-    results.to_csv(save_path + "[%s]clustering+regression_results.csv" % model_name)
+    results.to_csv(save_path + "%s/MAE-clustering+regression_results.csv" % model_name)
 
 

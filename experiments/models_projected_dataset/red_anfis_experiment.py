@@ -2,15 +2,65 @@ import pandas
 import numpy
 
 # Sklearn imports
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import cross_val_score
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
 from sklearn.model_selection import KFold
-from experiments import anfis_model
-from clustering_models.em import ExpectationMaximization
-from clustering_models.som import SelfOrganizingMap
+
+import experiments.anfis_packages.anfis
+from experiments.anfis_packages import membershipfunction
+from experiments.anfis_packages.anfis import ANFIS
+
+
+class MyANFIS:
+    def __init__(self, data, y):
+        self.data = data
+        self.y = y
+        self.num_invars = numpy.size(data, 1)
+
+        mf = self.create_gauss_mfs(data)
+        self.mfc = membershipfunction.MemFuncs(mf)
+        self.anf = None
+
+    def fit(self, k, gamma):
+        self.anf = ANFIS(self.data, self.y, self.mfc)
+        self.anf.trainHybridJangOffLine(k, initialGamma=gamma, epochs=10)
+
+    def predict(self, data):
+        return experiments.anfis_packages.anfis.predict(self.anf, data)
+
+    def make_gauss_mfs(self, sigma, mu_list):
+        '''Return a list of gaussian mfs, same sigma, list of means'''
+        l = []
+        for mu in mu_list:
+            l.append(['gaussmf', {'mean': mu, 'sigma': sigma}])
+        # mf = [GaussMembFunc(mu, sigma) for mu in mu_list]
+        return l
+
+    def create_gauss_mfs(self, x, num_mfs=2, num_out=2, hybrid=True):
+        minvals = numpy.min(self.data, axis=0)
+
+        maxvals = numpy.max(self.data, axis=0)
+        # ranges = np.abs(maxvals) - np.abs(minvals)
+        ranges = numpy.absolute(maxvals - minvals)
+        invars = []
+        for i in range(self.num_invars):
+            sigma = ranges[i] / num_mfs
+            mulist = numpy.linspace(minvals[i], maxvals[i], num_mfs).tolist()
+            invars.append(self.make_gauss_mfs(sigma, mulist))
+        return invars
+
+
+class GaussMembFunc:
+    def __init__(self, mu, sigma):
+        super(GaussMembFunc, self).__init__()
+        self.mu = mu
+        self.sigma = sigma
+
+    def forward(self, x):
+        val = numpy.exp(-numpy.pow(x - self.mu, 2) / (2 * self.sigma ** 2))
+        return val
 
 
 if __name__ == '__main__':
@@ -32,7 +82,6 @@ if __name__ == '__main__':
     X_all = df[ParkinsonDataset.FEATURES].values
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
     y_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
-
 
     # Create cross-validation partition
     for algorithm, num_clusters in zip(clustering_algorithms, algorithm_clusters):
@@ -60,7 +109,7 @@ if __name__ == '__main__':
 
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
-                model = anfis_model.MyANFIS(X_train, y_train)
+                model = MyANFIS(X_train, y_train)
                 model.fit(k=0.051, gamma=4000)
 
                 # Save results for later processing/analysis ==============================================
@@ -68,7 +117,7 @@ if __name__ == '__main__':
 
                 y_pred_total_clusters[cluster, :] = y_pred[:, 0]
                 # Motor __________________________________________________
-                y_pred_motor_clusters[cluster, :] = y_pred[:,1]
+                y_pred_motor_clusters[cluster, :] = y_pred[:, 1]
 
             y_ensembled_total = y_pred_total_clusters.sum(axis=0) / num_clusters
             y_ensembled_motor = y_pred_motor_clusters.sum(axis=0) / num_clusters
@@ -82,4 +131,4 @@ if __name__ == '__main__':
         results.at[algorithm, "Total-Test"] = total_results
         results.at[algorithm, "Motor-Test"] = motor_results
         print(results)
-        results.to_csv(save_path + "[%s]clustering+regression_results.csv" % model_name)
+    results.to_csv(save_path + "%s/MAE-clustering+regression_results.csv" % model_name)

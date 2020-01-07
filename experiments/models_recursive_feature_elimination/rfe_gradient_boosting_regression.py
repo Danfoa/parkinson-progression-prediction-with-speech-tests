@@ -14,9 +14,6 @@ from utils.dataset_loader import ParkinsonDataset as PD
 from utils.visualizer import *
 from sklearn.model_selection import KFold
 
-# EXECUTION_MODE = "RUN"
-EXECUTION_MODE = "SEARCH"
-
 if __name__ == '__main__':
     model_name = "GBR"
     # Example of loading the dataset _________________________________________________________________
@@ -41,54 +38,6 @@ if __name__ == '__main__':
     y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
     # Get MOTOR UPDRS targets
     y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
-    # ________________________________________________________________________________________________
-
-    # Design experiment to train model hyper-parameters:
-    if EXECUTION_MODE == "SEARCH":
-        components_vec = numpy.array([6, len(PD.FEATURES)])
-        results = pandas.DataFrame(
-            columns=['Total-Test', "Total-Params", 'Motor-Test', "Motor-Params"],
-            index=components_vec)
-
-        for n_components in components_vec:
-            # Dimensionality reduction techniques ____________________________________________________________
-            pca = PCA(n_components=n_components, svd_solver='full')
-            pca.fit(X_all)
-            # Transform dataset to new vector space
-            X_all_transformed = pca.transform(X_all - X_all.mean(axis=0))
-            if n_components == len(PD.FEATURES):
-                print("Original dataset")
-                X_all_transformed = X_all
-            # GBR Hyper-Parameter search _____________________________________________________________________
-            # Define Model, params and grid search scheme with cross validation.
-            parameters = {'learning_rate': numpy.linspace(0.0001, 0.005, 5),
-                          'max_depth': [8, 10, 15]}
-            gbr = GradientBoostingRegressor(loss='ls', n_estimators=20000, n_iter_no_change=10, validation_fraction=0.2)
-            clf = GridSearchCV(gbr, parameters, scoring='neg_mean_absolute_error', cv=KFold(n_splits=5, shuffle=True),
-                               verbose=1, n_jobs=3)
-            # Train two models, one for each target
-            for y_target, y_type in zip([y_all_total, y_all_motor], ['Total', 'Motor']):
-                print("num-PCs=%d Training %s on %s" % (n_components, model_name, y_type))
-                # Perform grid search
-                clf.fit(X_all_transformed, y_target)
-                # Save results for later processing/analysis ==============================================
-                results.at[n_components, y_type + '-Test'] = clf.cv_results_['mean_test_score'][clf.best_index_]
-                # results.at[n_components, y_type + '-Train'] = clf.cv_results_['mean_train_score'][clf.best_index_]
-                results.at[n_components, y_type + '-Params'] = clf.best_params_
-                svr_model = clf.best_estimator_
-                print(results)
-        results.to_csv("../results/outputs/%s/MAE-diff-components.csv" % model_name)
-        print(results)
-
-    # Train best model for total
-    # pca = PCA(n_components=5, svd_solver='full')
-    # X_train_transformed = pca.fit_transform(X_train)
-    # X_test_transformed = pca.transform(X_test - X_test.mean(axis=0))
-    # params = {'learning_rate': 0.001, 'loss': 'ls', 'max_depth': 3}
-    # pca_gbr_total = GradientBoostingRegressor(n_estimators=2000, **params)
-    # pca_gbr_total.fit(X_train_transformed, y_train_total)
-    # y_pred_total = pca_gbr_total.predict(X_test_transformed)
-    # mae_pca_gbr_total = mean_absolute_error(y_test_total, y_pred_total)
     # _____________________________________________________________________________________________________
     # Experiment on Recursive feature elimination
     params = {'n_iter_no_change': 10,
@@ -135,5 +84,5 @@ if __name__ == '__main__':
     plt.ylabel("Cross validated average MAE")
     plt.legend()
     plt.tight_layout()
-    plt.savefig("../media/" + title.replace(" ", "_") + ".png")
+    plt.savefig("../media/rfe/" + title.replace(" ", "_") + ".png")
     plt.show()

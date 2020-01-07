@@ -3,7 +3,7 @@ import numpy
 
 # Sklearn imports
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import cross_val_score
 # Custom imports
@@ -11,7 +11,7 @@ from utils.dataset_loader import ParkinsonDataset
 from sklearn.model_selection import KFold
 
 if __name__ == '__main__':
-    model_name = "RFR_Reduced_Dataset"
+    model_name = "TEST" #TODO Change the name to save properly (without spaces)
     load_path = "../../results/reduction/"
     save_path = "../../results/outputs/"
 
@@ -24,7 +24,7 @@ if __name__ == '__main__':
                                        return_gender=False)
     # Normalizing/scaling  dataset
     feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=MinMaxScaler(),
+                                                             scaler=StandardScaler(),
                                                              inplace=True)
     X_all = df[ParkinsonDataset.FEATURES].values
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
@@ -32,9 +32,9 @@ if __name__ == '__main__':
 
     results = pandas.DataFrame(columns=['Total-Test', 'Motor-Test'],
                                index=clustering_algorithms)
-
     # Create cross-validation partition
     for algorithm, num_clusters in zip(clustering_algorithms, algorithm_clusters):
+        print(algorithm)
 
         # Create CV loop, providing indexes of training and testing
         total_results, motor_results = [], []
@@ -53,8 +53,7 @@ if __name__ == '__main__':
                                                                                                      cluster))
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
-                # RFR
-                model = RandomForestRegressor(criterion='mae', n_estimators=200)
+                #TODO Put your model definition here
 
                 # Total __________________________________________________
                 model.fit(X_train, y_total_train)
@@ -76,6 +75,4 @@ if __name__ == '__main__':
         results.at[algorithm, "Total-Test"] = total_results
         results.at[algorithm, "Motor-Test"] = motor_results
         print(results)
-    results.to_csv(save_path + "[%s]clustering+regression_results.csv" % model_name)
-
-
+    results.to_csv(save_path + "%s/MAE-clustering+regression_results.csv" % model_name)

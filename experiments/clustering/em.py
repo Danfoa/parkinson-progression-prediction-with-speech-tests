@@ -13,7 +13,7 @@ def __train_em_model(data):
 
 if __name__ == '__main__':
     # Example of loading the dataset
-    df = ParkinsonDataset.load_dataset(path="dataset/parkinsons_updrs.data",
+    df = ParkinsonDataset.load_dataset(path="../dataset/parkinsons_updrs.data",
                                        return_gender=False)
 
     # Normalizing/scaling  dataset

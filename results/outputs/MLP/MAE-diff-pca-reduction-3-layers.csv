@@ -1,0 +1,8 @@
+,Total-Test,Total-Params,Motor-Test,Motor-Params
+0,3.4556780158249873,"{'activation': 'relu', 'lr': 0.01}",2.8260853521105176,"{'activation': 'relu', 'lr': 0.01}"
+1,3.4806469495161343,"{'activation': 'relu', 'lr': 0.025}",2.928046425634506,"{'activation': 'relu', 'lr': 0.025}"
+2,3.274276514663372,"{'activation': 'relu', 'lr': 0.01}",2.674120009462397,"{'activation': 'relu', 'lr': 0.01}"
+3,3.349190247875457,"{'activation': 'relu', 'lr': 0.01}",2.937390883128714,"{'activation': 'relu', 'lr': 0.01}"
+4,3.6594807806993854,"{'activation': 'relu', 'lr': 0.01}",2.973440912342477,"{'activation': 'relu', 'lr': 0.01}"
+5,3.6775404276512633,"{'activation': 'relu', 'lr': 0.01}",2.901640547582748,"{'activation': 'relu', 'lr': 0.01}"
+6,3.7004914344833053,"{'activation': 'relu', 'lr': 0.01}",3.002527027102856,"{'activation': 'relu', 'lr': 0.01}"
