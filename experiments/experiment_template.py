@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
-from utils.visualizer import *
+from utils.experiment_one_plot import *
 
 if __name__ == '__main__':
     # Example of loading the dataset

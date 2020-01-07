@@ -12,7 +12,7 @@ from sklearn.feature_selection import RFE
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset as PD
-from utils.visualizer import *
+from utils.experiment_one_plot import *
 
 EXECUTION_MODE = "RUN"
 # EXECUTION_MODE = "SEARCH"

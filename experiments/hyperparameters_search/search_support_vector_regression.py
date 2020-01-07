@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
-from utils.visualizer import *
+from utils.experiment_one_plot import *
 
 
 if __name__ == '__main__':
