@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from matplotlib import style
 style.use('fivethirtyeight')
 import os
+import seaborn as sns
+from matplotlib import pyplot as plt
+import pandas as pd
 
 
 class ExpectationMaximization:
@@ -28,11 +31,21 @@ class ExpectationMaximization:
         min_idx_aic = int(np.argmin(aic))
         self.model = models[best_n_components]
 
-        plt.plot(n_components, aic, label='AIC')
-        plt.plot(n_components, bic, label='BIC')
+        # plt.plot(n_components, aic, label='AIC')
+        # plt.plot(n_components, bic, label='BIC')
 
-        plt.legend(loc='best')
-        plt.xlabel('n_components')
+
+        metric = pd.DataFrame(data={
+                                'BIC': bic,
+                                'AIC': aic})
+
+        x = np.arange(1, 21,3)
+        sns.lineplot(data=metric, color="coral")
+        plt.xticks(x)
+        plt.tight_layout()
+
+        plt.show()
+
         path = os.path.join('..', 'media/clustering/em/EM_BIC_AIC.png')
         plt.savefig(path)
         plt.close()

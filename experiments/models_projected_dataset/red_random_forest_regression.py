@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 
                 # RFR
-                model = RandomForestRegressor(criterion='mae', n_estimators=200)
+                model = RandomForestRegressor(criterion='mae', n_estimators=500)
 
                 # Total __________________________________________________
                 model.fit(X_train, y_total_train)

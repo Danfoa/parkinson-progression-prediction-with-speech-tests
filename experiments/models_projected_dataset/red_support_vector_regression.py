@@ -38,6 +38,7 @@ if __name__ == '__main__':
         # Create CV loop, providing indexes of training and testing
         total_results, motor_results = [], []
         cv_splitter = KFold(n_splits=5, shuffle=True)
+
         for train_index, test_index in cv_splitter.split(X_all):
             # Get ground truth
             y_total_train, y_total_test = y_total[train_index], y_total[test_index]
