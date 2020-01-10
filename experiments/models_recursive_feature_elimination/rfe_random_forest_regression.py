@@ -9,51 +9,57 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import MinMaxScaler
 
 # Custom imports
-from utils.dataset_loader import ParkinsonDataset
+from utils.dataset_loader import ParkinsonDataset as PD
 
 if __name__ == '__main__':
     model_name = "RFR"
     # Example of loading the dataset _________________________________________________________________
-    df, ids, df_males, df_females = ParkinsonDataset.load_dataset(path="../dataset/parkinsons_updrs.data",
+    df, ids, df_males, df_females = PD.load_dataset(path="../dataset/parkinsons_updrs.data",
                                                                   return_gender=True)
 
     # Normalizing/scaling  dataset
-    ParkinsonDataset.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
+    PD.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
 
     # Split dataset
-    X_all = df[ParkinsonDataset.FEATURES].values
-    y_all_total = df[ParkinsonDataset.TOTAL_UPDRS].values
-    y_all_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
+    X_all = df[PD.FEATURES].values
+    y_all_total = df[PD.TOTAL_UPDRS].values
+    y_all_motor = df[PD.MOTOR_UPDRS].values
 
     # ________________________________________________________________________________________________
     # Experiment on Recursive feature elimination
     params = {'n_estimators': 500}
     model = RandomForestRegressor(**params)
 
-    all_feature_masks, all_mae_log = ParkinsonDataset.recursive_feature_elimination(model=model, X=X_all,
-                                                                                    y_total=y_all_total,
-                                                                                    y_motor=y_all_motor)
-    print("[All] Total features: %s" % numpy.array(ParkinsonDataset.FEATURES)[all_feature_masks['Total']])
-    print("[All] Motor features: %s" % numpy.array(ParkinsonDataset.FEATURES)[all_feature_masks['Motor']])
+    all_feature_masks, all_mae_log = PD.recursive_feature_elimination(model=model, X=X_all,
+                                                                      y_total=y_all_total,
+                                                                      y_motor=y_all_motor)
+    print("[All] Total features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[all_feature_masks['Total']],
+                                                       numpy.min(all_mae_log['Total'])))
+    print("[All] Motor features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[all_feature_masks['Motor']],
+                                                       numpy.min(all_mae_log['Motor'])))
 
-    X_males = df_males[ParkinsonDataset.FEATURES].values
-    y_total = df_males[ParkinsonDataset.TOTAL_UPDRS].values
-    y_motor = df_males[ParkinsonDataset.MOTOR_UPDRS].values
-    male_feature_masks, male_mae_log = ParkinsonDataset.recursive_feature_elimination(model=model, X=X_males,
-                                                                                      y_total=y_total,
-                                                                                      y_motor=y_motor)
-    print("[Male] Total features: %s" % numpy.array(ParkinsonDataset.FEATURES)[male_feature_masks['Total']])
-    print("[Male] Motor features: %s" % numpy.array(ParkinsonDataset.FEATURES)[male_feature_masks['Motor']])
+    X_males = df_males[PD.FEATURES].values
+    y_total = df_males[PD.TOTAL_UPDRS].values
+    y_motor = df_males[PD.MOTOR_UPDRS].values
+    male_feature_masks, male_mae_log = PD.recursive_feature_elimination(model=model, X=X_males,
+                                                                        y_total=y_total,
+                                                                        y_motor=y_motor)
+    print("[Male] Total features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[male_feature_masks['Total']],
+                                                        numpy.min(male_mae_log['Total'])))
+    print("[Male] Motor features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[male_feature_masks['Motor']],
+                                                        numpy.min(male_mae_log['Motor'])))
 
-    X_females = df_females[ParkinsonDataset.FEATURES].values
-    y_total = df_females[ParkinsonDataset.TOTAL_UPDRS].values
-    y_motor = df_females[ParkinsonDataset.MOTOR_UPDRS].values
-    female_feature_masks, female_mae_log = ParkinsonDataset.recursive_feature_elimination(model=model, X=X_females,
-                                                                                          y_total=y_total,
-                                                                                          y_motor=y_motor)
+    X_females = df_females[PD.FEATURES].values
+    y_total = df_females[PD.TOTAL_UPDRS].values
+    y_motor = df_females[PD.MOTOR_UPDRS].values
+    female_feature_masks, female_mae_log = PD.recursive_feature_elimination(model=model, X=X_females,
+                                                                            y_total=y_total,
+                                                                            y_motor=y_motor)
 
-    print("[Female] Total features: %s" % numpy.array(ParkinsonDataset.FEATURES)[female_feature_masks['Total']])
-    print("[Female] Motor features: %s" % numpy.array(ParkinsonDataset.FEATURES)[female_feature_masks['Motor']])
+    print("[Female] Total features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[female_feature_masks['Total']],
+                                                          numpy.min(female_mae_log['Total'])))
+    print("[Female] Motor features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[female_feature_masks['Motor']],
+                                                          numpy.min(female_mae_log['Motor'])))
 
     plt.figure()
     x_log = range(1, len(all_mae_log['Total']) + 1)
