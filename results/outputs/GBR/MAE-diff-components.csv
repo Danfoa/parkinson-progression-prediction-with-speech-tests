@@ -1,3 +1,6 @@
 ,Total-Test,Total-Params,Motor-Test,Motor-Params
-6,-4.7086876457698965,"{'learning_rate': 0.0037749999999999997, 'max_depth': 10}",-3.7131455776899536,"{'learning_rate': 0.0037749999999999997, 'max_depth': 10}"
-17,-2.574015276172611,"{'learning_rate': 0.0037749999999999997, 'max_depth': 10}",-2.086702192859783,"{'learning_rate': 0.0025499999999999997, 'max_depth': 10}"
+4,-4.678661147658772,"{'learning_rate': 0.0042, 'max_depth': 10}",-3.721838362121088,"{'learning_rate': 0.0042, 'max_depth': 10}"
+6,-4.77006438812307,"{'learning_rate': 0.0042, 'max_depth': 10}",-3.6871978603893125,"{'learning_rate': 0.0042, 'max_depth': 10}"
+10,-4.549307254785687,"{'learning_rate': 0.0042, 'max_depth': 10}",-3.612552976117815,"{'learning_rate': 0.0042, 'max_depth': 10}"
+14,-4.6016755312603275,"{'learning_rate': 0.0042, 'max_depth': 10}",-3.553294465351957,"{'learning_rate': 0.0042, 'max_depth': 10}"
+17,-2.6323868991372277,"{'learning_rate': 0.0042, 'max_depth': 10}",-2.096693308640353,"{'learning_rate': 0.0042, 'max_depth': 10}"

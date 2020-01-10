@@ -9,11 +9,14 @@ from statistics import mean
 import pandas
 import csv
 
+
 def convertList(list):
     a = list.replace("[", " ")
     a = a.replace("]", " ")
     a = a.split(",")
     return a
+
+
 def readValues(path):
     with open(path, 'r') as file:
         reader = csv.reader(file)
@@ -35,7 +38,6 @@ total_MLP, motor_MLP = readValues("../results/outputs/MLP/MAE-final-MLP-KFold.cs
 total_RFR, motor_RFR = readValues("../results/outputs/RFR/MAE-final-RFR-KFold.csv")
 total_SVR, motor_SVR = readValues("../results/outputs/SVR/MAE-final-SVR-KFold.csv")
 
-
 df = pandas.DataFrame({
     'Models': ["GBR", "MLP", "RFR", "SVR"],
     'Total_UPDRS': [total_GBR[0], total_MLP[0], total_RFR[0], total_SVR[0]],
@@ -45,18 +47,18 @@ df = pandas.DataFrame({
 fig, ax1 = plt.subplots(figsize=(15, 11))
 tidy = df.melt(id_vars='Models').rename(columns=str.title)
 
-sn = seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1, palette ='bone')
-sn.axes.set_title("Total_UPDRS Model comparison",fontsize=22)
-sn.set_xlabel("Models",fontsize=18)
-sn.set_ylabel("MAE",fontsize=18)
+sn = seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1, palette='bone')
+sn.axes.set_title("Total_UPDRS Model comparison", fontsize=22)
+sn.set_xlabel("Models", fontsize=18)
+sn.set_ylabel("MAE", fontsize=18)
 seaborn.despine(fig)
 
 plt.setp(ax1.get_legend().get_texts(), fontsize='17')
 plt.xticks(fontsize=18)
 plt.yticks(fontsize=18)
 
-plt.savefig("../media/total_UPDRS_Model_comparison.png")
-plt.show()
+# plt.savefig("../media/total_UPDRS_Model_comparison.png")
+# plt.show()
 
 df = pandas.DataFrame({
     'Models': ["GBR", "MLP", "RFR", "SVR"],
@@ -69,15 +71,28 @@ df = pandas.DataFrame({
 fig, ax1 = plt.subplots(figsize=(15, 11))
 tidy = df.melt(id_vars='Models').rename(columns=str.title)
 
-sn = seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1, palette ='bone')
-sn.axes.set_title("Motor_UPDRS Model comparison",fontsize=22)
-sn.set_xlabel("Models",fontsize=18)
-sn.set_ylabel("MAE",fontsize=18)
+sn = seaborn.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1, palette='bone')
+sn.axes.set_title("Motor_UPDRS Model comparison", fontsize=22)
+sn.set_xlabel("Models", fontsize=18)
+sn.set_ylabel("MAE", fontsize=18)
 seaborn.despine(fig)
 
 plt.setp(ax1.get_legend().get_texts(), fontsize='17')
 plt.xticks(fontsize=18)
 plt.yticks(fontsize=18)
 
-plt.savefig("../media/motor_UPDRS_Model_comparison.png")
-plt.show()
+
+# plt.savefig("../media/motor_UPDRS_Model_comparison.png")
+# plt.show()
+
+###################################################
+
+def readFiles(paths):
+    for path in paths:
+        pandas.read_csv("vfghbjnk")
+
+    return "yes"
+
+
+svr = pandas.read_csv("../results/outputs/SVR/MAE-diff-components.csv", usecols=['Total-Test', 'Motor-Test'])
+print(svr.get)
