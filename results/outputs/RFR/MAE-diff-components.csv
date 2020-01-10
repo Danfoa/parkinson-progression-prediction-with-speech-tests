@@ -1,0 +1,6 @@
+,Total-Test,Total-Params,Motor-Test,Motor-Params
+4,-4.3591428519659585,{'n_estimators': 500},-3.4106079593758865,{'n_estimators': 150}
+6,-4.4980031302297885,{'n_estimators': 500},-3.5244084774127646,{'n_estimators': 500}
+10,-4.434805923114895,{'n_estimators': 500},-3.4724876914042544,{'n_estimators': 500}
+14,-4.61547385024681,{'n_estimators': 500},-3.5719861169361695,{'n_estimators': 500}
+17,-2.5793592618297874,{'n_estimators': 200},-1.986006463029787,{'n_estimators': 500}
