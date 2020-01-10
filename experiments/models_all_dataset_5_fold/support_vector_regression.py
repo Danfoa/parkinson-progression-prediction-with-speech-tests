@@ -47,24 +47,17 @@ if __name__ == '__main__':
 
     # ALL
     total_results, motor_results = [], []
-    for i in range(5):
-        X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df,
-                                                                          subject_partitioning=False)
-        # Get TOTAL UPDRS targets
-        y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
-        # Get MOTOR UPDRS targets
-        y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
-
+    for train_index, test_index in cv_splitter.split(X_all):
         model = SVR(**params)
         # Total __________________________________________________
-        model.fit(X_train, y_train_total)
-        y_pred_total = model.predict(X_test)
+        model.fit(X_all[train_index], y_all_total[train_index])
+        y_pred_total = model.predict(X_all[test_index])
         # Motor __________________________________________________
-        model.fit(X_train, y_train_motor)
-        y_pred_motor = model.predict(X_test)
+        model.fit(X_all[train_index], y_all_motor[train_index])
+        y_pred_motor = model.predict(X_all[test_index])
 
-        mae_total = mean_absolute_error(y_test_total, y_pred_total)
-        mae_motor = mean_absolute_error(y_test_motor, y_pred_motor)
+        mae_total = mean_absolute_error(y_all_total[test_index], y_pred_total)
+        mae_motor = mean_absolute_error(y_all_motor[test_index], y_pred_motor)
         total_results.append(mae_total)
         motor_results.append(mae_motor)
 
@@ -74,24 +67,17 @@ if __name__ == '__main__':
 
     # MALES
     total_results, motor_results = [], []
-    for i in range(5):
-        X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df_males,
-                                                                          subject_partitioning=False)
-        # Get TOTAL UPDRS targets
-        y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
-        # Get MOTOR UPDRS targets
-        y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
-
+    for train_index, test_index in cv_splitter.split(X_males):
         model = SVR(**params)
         # Total __________________________________________________
-        model.fit(X_train, y_train_total)
-        y_pred_total = model.predict(X_test)
+        model.fit(X_males[train_index], y_males_total[train_index])
+        y_pred_total = model.predict(X_males[test_index])
         # Motor __________________________________________________
-        model.fit(X_train, y_train_motor)
-        y_pred_motor = model.predict(X_test)
+        model.fit(X_males[train_index], y_males_motor[train_index])
+        y_pred_motor = model.predict(X_males[test_index])
 
-        mae_total = mean_absolute_error(y_test_total, y_pred_total)
-        mae_motor = mean_absolute_error(y_test_motor, y_pred_motor)
+        mae_total = mean_absolute_error(y_males_total[test_index], y_pred_total)
+        mae_motor = mean_absolute_error(y_males_motor[test_index], y_pred_motor)
         total_results.append(mae_total)
         motor_results.append(mae_motor)
 
@@ -101,24 +87,17 @@ if __name__ == '__main__':
 
     # FEMALE
     total_results, motor_results = [], []
-    for i in range(5):
-        X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df_females,
-                                                                          subject_partitioning=False)
-        # Get TOTAL UPDRS targets
-        y_train_total, y_test_total = y_train[:, 0], y_test[:, 0]
-        # Get MOTOR UPDRS targets
-        y_train_motor, y_test_motor = y_train[:, 1], y_test[:, 1]
-
+    for train_index, test_index in cv_splitter.split(X_females):
         model = SVR(**params)
         # Total __________________________________________________
-        model.fit(X_train, y_train_total)
-        y_pred_total = model.predict(X_test)
+        model.fit(X_females[train_index], y_females_total[train_index])
+        y_pred_total = model.predict(X_females[test_index])
         # Motor __________________________________________________
-        model.fit(X_train, y_train_motor)
-        y_pred_motor = model.predict(X_test)
+        model.fit(X_females[train_index], y_females_motor[train_index])
+        y_pred_motor = model.predict(X_females[test_index])
 
-        mae_total = mean_absolute_error(y_test_total, y_pred_total)
-        mae_motor = mean_absolute_error(y_test_motor, y_pred_motor)
+        mae_total = mean_absolute_error(y_females_total[test_index], y_pred_total)
+        mae_motor = mean_absolute_error(y_females_motor[test_index], y_pred_motor)
         total_results.append(mae_total)
         motor_results.append(mae_motor)
 

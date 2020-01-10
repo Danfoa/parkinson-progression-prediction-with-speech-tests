@@ -40,12 +40,11 @@ if __name__ == '__main__':
     results = pandas.DataFrame(columns=['Total-Test', 'Motor-Test'],
                                index=["All", "Males", "Females"])
 
-    # Create CV loop, providing indexes of training and testing
-    total_results, motor_results = [], []
-    cv_splitter = KFold(n_splits=5, shuffle=True)
-
     # ALL
-    for train_index, test_index in cv_splitter.split(X_all):
+    total_results, motor_results = [], []
+    K = 5
+    for i in range(K):
+        X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df)
         model = keras.Sequential()
         for layer in range(len(hidden_units)):
             model.add(layers.Dense(units=hidden_units[layer], activation=activation))
@@ -56,20 +55,17 @@ if __name__ == '__main__':
                       optimizer=optimizer,
                       metrics=['mae', 'mse'])
 
-        print(X_all[train_index].shape)
-        print(X_all[test_index].shape)
-        history = model.fit(x=X_all[train_index],
-                            y=y_all[train_index],
+        history = model.fit(x=X_train,
+                            y=y_train,
                             epochs=1000,
                             validation_split=0.1,
-                            shuffle=True,
                             verbose=0,
                             callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)])
 
-        y_pred = model.predict(X_all[test_index])
+        y_pred = model.predict(X_test)
 
-        mae_total = mean_absolute_error(y_all[test_index, 0], y_pred[:, 0])
-        mae_motor = mean_absolute_error(y_all[test_index, 1], y_pred[:, 1])
+        mae_total = mean_absolute_error(y_test[:, 0], y_pred[:, 0])
+        mae_motor = mean_absolute_error(y_test[:, 1], y_pred[:, 1])
         total_results.append(mae_total)
         motor_results.append(mae_motor)
 
@@ -79,7 +75,9 @@ if __name__ == '__main__':
 
     # MALE
     total_results, motor_results = [], []
-    for train_index, test_index in cv_splitter.split(X_males):
+    K = 5
+    for i in range(K):
+        X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df_males)
         model = keras.Sequential()
         for layer in range(len(hidden_units)):
             model.add(layers.Dense(units=hidden_units[layer], activation=activation))
@@ -90,20 +88,17 @@ if __name__ == '__main__':
                       optimizer=optimizer,
                       metrics=['mae', 'mse'])
 
-        print(X_males[train_index].shape)
-        print(X_males[test_index].shape)
-        history = model.fit(x=X_males[train_index],
-                            y=y_males[train_index],
+        history = model.fit(x=X_train,
+                            y=y_train,
                             epochs=1000,
                             validation_split=0.1,
-                            shuffle=True,
                             verbose=0,
                             callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)])
 
-        y_pred = model.predict(X_males[test_index])
+        y_pred = model.predict(X_test)
 
-        mae_total = mean_absolute_error(y_males[test_index, 0], y_pred[:, 0])
-        mae_motor = mean_absolute_error(y_males[test_index, 1], y_pred[:, 1])
+        mae_total = mean_absolute_error(y_test[:, 0], y_pred[:, 0])
+        mae_motor = mean_absolute_error(y_test[:, 1], y_pred[:, 1])
         total_results.append(mae_total)
         motor_results.append(mae_motor)
 
@@ -113,7 +108,9 @@ if __name__ == '__main__':
 
     # FEMALE
     total_results, motor_results = [], []
-    for train_index, test_index in cv_splitter.split(X_females):
+    K = 5
+    for i in range(K):
+        X_train, X_test, y_train, y_test = ParkinsonDataset.split_dataset(dataset=df_females)
         model = keras.Sequential()
         for layer in range(len(hidden_units)):
             model.add(layers.Dense(units=hidden_units[layer], activation=activation))
@@ -124,20 +121,17 @@ if __name__ == '__main__':
                       optimizer=optimizer,
                       metrics=['mae', 'mse'])
 
-        print(X_females[train_index].shape)
-        print(X_females[test_index].shape)
-        history = model.fit(x=X_females[train_index],
-                            y=y_females[train_index],
+        history = model.fit(x=X_train,
+                            y=y_train,
                             epochs=1000,
                             validation_split=0.1,
-                            shuffle=True,
                             verbose=0,
                             callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', patience=50)])
 
-        y_pred = model.predict(X_females[test_index])
+        y_pred = model.predict(X_test)
 
-        mae_total = mean_absolute_error(y_females[test_index, 0], y_pred[:, 0])
-        mae_motor = mean_absolute_error(y_females[test_index, 1], y_pred[:, 1])
+        mae_total = mean_absolute_error(y_test[:, 0], y_pred[:, 0])
+        mae_motor = mean_absolute_error(y_test[:, 1], y_pred[:, 1])
         total_results.append(mae_total)
         motor_results.append(mae_motor)
 
