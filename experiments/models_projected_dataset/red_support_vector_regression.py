@@ -24,7 +24,7 @@ if __name__ == '__main__':
                                        return_gender=False)
     # Normalizing/scaling  dataset
     feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=MinMaxScaler(),
+                                                             scaler=StandardScaler(),
                                                              inplace=True)
     X_all = df[ParkinsonDataset.FEATURES].values
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
