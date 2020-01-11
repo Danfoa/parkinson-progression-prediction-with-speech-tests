@@ -17,7 +17,7 @@ if __name__ == '__main__':
     save_path = "../../results/reduction/"
 
     clustering_algorithms = ["fuzzy_c_means", "som", "em"]
-    clusters = [[4, 5], [9], [12]]
+    clusters = [[4, 5], [4, 9], [4, 12]]
 
     # loading the dataset
     df = ParkinsonDataset.load_dataset(path="../dataset/parkinsons_updrs.data",
