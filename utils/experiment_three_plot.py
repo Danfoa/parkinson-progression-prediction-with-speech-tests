@@ -39,7 +39,7 @@ def makePlot(total, motor, model):
     df = pandas.DataFrame(
         {'Clusters': ['fuzzy', 'som', 'em'], 'Total_UPDRS': total,
          'Motor_UPDRS': motor})
-    fig, ax1 = plt.subplots(figsize=(15, 9))
+    fig, ax1 = plt.subplots(figsize=(15, 7))
     tidy = df.melt(id_vars='Clusters').rename(columns=str.title)
 
     sn = sb.barplot(x='Value', y='Clusters', hue='Variable', data=tidy, ax=ax1, palette='bone')
@@ -49,9 +49,8 @@ def makePlot(total, motor, model):
     sn.set_ylabel("Clusters", fontsize=18)
     sb.despine(fig)
 
-
-
-    plt.setp(ax1.get_legend().get_texts(), fontsize='17')
+   #plt.setp(ax1.get_legend().get_texts(), fontsize='17')
+    ax1.get_legend().remove()
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
     plt.tight_layout()
