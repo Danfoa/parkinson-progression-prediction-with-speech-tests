@@ -1,7 +1,7 @@
 import itertools
 import numpy as np
 import copy
-from regression_models.anfis_packages import mfDerivs, membershipfunction
+from experiments.anfis_packages import mfDerivs, membershipfunction
 from skfuzzy import gaussmf
 from joblib import Parallel, delayed
 

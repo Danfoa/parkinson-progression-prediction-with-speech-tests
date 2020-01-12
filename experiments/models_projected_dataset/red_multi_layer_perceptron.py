@@ -32,6 +32,8 @@ if __name__ == '__main__':
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
     y_motor = df[ParkinsonDataset.MOTOR_UPDRS].values
 
+    indices = numpy.arange(len(y_total))
+
     results = pandas.DataFrame(columns=['Total-Test', 'Motor-Test'],
                                index=clustering_algorithms)
 
@@ -39,13 +41,12 @@ if __name__ == '__main__':
     for algorithm, num_clusters in zip(clustering_algorithms, algorithm_clusters):
         # Create CV loop, providing indexes of training and testing
         total_results, motor_results = [], []
-        cv_splitter = KFold(n_splits=5, shuffle=True)
-        for train_index, test_index in cv_splitter.split(X_all):
-            # Get ground truth
-            y_train = y_all[train_index]
-            y_total_test = y_total[test_index]
-            y_motor_test = y_motor[test_index]
 
+        K = 5
+        for i in range(K):
+            X_train, X_test, y_train, y_test, train_index, test_index = ParkinsonDataset.split_dataset_indices(dataset=df, indices=indices)
+            y_total_test = y_test[:, 0]
+            y_motor_test = y_test[:, 1]
             # Allocate matrix for predictions
             y_pred_total_clusters = numpy.ones((num_clusters, len(test_index)))
             y_pred_motor_clusters = numpy.ones((num_clusters, len(test_index)))
