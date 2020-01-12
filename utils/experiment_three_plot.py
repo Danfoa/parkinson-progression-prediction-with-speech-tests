@@ -37,9 +37,9 @@ def readValues(path):
 
 def makePlot(total, motor, model):
     df = pandas.DataFrame(
-        {'Clusters': ['fuzzy_c_means', 'som', 'em'], 'Total_UPDRS': total,
+        {'Clusters': ['fuzzy', 'som', 'em'], 'Total_UPDRS': total,
          'Motor_UPDRS': motor})
-    fig, ax1 = plt.subplots(figsize=(15, 11))
+    fig, ax1 = plt.subplots(figsize=(15, 9))
     tidy = df.melt(id_vars='Clusters').rename(columns=str.title)
 
     sn = sb.barplot(x='Value', y='Clusters', hue='Variable', data=tidy, ax=ax1, palette='bone')
@@ -69,3 +69,5 @@ makePlot(GBR_values[0], GBR_values[1], "GBR")
 makePlot(MLP_values[0], MLP_values[1], "MLP")
 makePlot(RFR_values[0], RFR_values[1], "RFR")
 makePlot(SVR_values[0], SVR_values[1], "SVR")
+
+
