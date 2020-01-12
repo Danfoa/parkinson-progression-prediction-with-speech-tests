@@ -43,10 +43,13 @@ def makePlot(total, motor, model):
     tidy = df.melt(id_vars='Clusters').rename(columns=str.title)
 
     sn = sb.barplot(x='Value', y='Clusters', hue='Variable', data=tidy, ax=ax1, palette='bone')
+
     sn.axes.set_title(model, fontsize=22)
     sn.set_xlabel("MAE", fontsize=18)
     sn.set_ylabel("Clusters", fontsize=18)
     sb.despine(fig)
+
+
 
     plt.setp(ax1.get_legend().get_texts(), fontsize='17')
     plt.xticks(fontsize=18)
