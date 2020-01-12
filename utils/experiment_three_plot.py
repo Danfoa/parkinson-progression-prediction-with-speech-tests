@@ -35,23 +35,37 @@ def readValues(path):
     return [total, motor]
 
 
+def change_width(ax, new_value):
+    print(len(ax.patches))
+    for i in range(len(ax.patches)):
+
+        current_width = ax.patches[i].get_height()
+        diff = current_width - new_value
+
+        # we change the bar width
+        ax.patches[i].set_height(new_value)
+
+        # we recenter the bar
+        if i < 3:
+            ax.patches[i].set_y(ax.patches[i].get_y() + diff)
+
+
+
 def makePlot(total, motor, model):
     df = pandas.DataFrame(
         {'Clusters': ['fuzzy', 'som', 'em'], 'Total_UPDRS': total,
          'Motor_UPDRS': motor})
-    fig, ax1 = plt.subplots(figsize=(15, 9))
+    fig, ax1 = plt.subplots(figsize=(15, 2.5))
     tidy = df.melt(id_vars='Clusters').rename(columns=str.title)
 
     sn = sb.barplot(x='Value', y='Clusters', hue='Variable', data=tidy, ax=ax1, palette='bone')
 
     sn.axes.set_title(model, fontsize=22)
     sn.set_xlabel("MAE", fontsize=18)
-    sn.set_ylabel("Clusters", fontsize=18)
+    sn.set_ylabel("", fontsize=18)
     sb.despine(fig)
-
-
-
-    plt.setp(ax1.get_legend().get_texts(), fontsize='17')
+    change_width(sn, 0.3)
+    ax1.get_legend().remove()
     plt.xticks(fontsize=18)
     plt.yticks(fontsize=18)
     plt.tight_layout()
