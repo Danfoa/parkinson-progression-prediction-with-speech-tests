@@ -55,7 +55,7 @@ def makePlot(total, motor, model):
     df = pandas.DataFrame(
         {'Clusters': ['fuzzy', 'som', 'em'], 'Total_UPDRS': total,
          'Motor_UPDRS': motor})
-    fig, ax1 = plt.subplots(figsize=(15, 2.5))
+    fig, ax1 = plt.subplots(figsize=(10, 2.5))
     tidy = df.melt(id_vars='Clusters').rename(columns=str.title)
 
     sn = sb.barplot(x='Value', y='Clusters', hue='Variable', data=tidy, ax=ax1, palette='bone')
