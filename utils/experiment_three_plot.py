@@ -64,6 +64,7 @@ def makePlot(total, motor, model):
     sn.set_xlabel("MAE", fontsize=18)
     sn.set_ylabel("", fontsize=18)
     sb.despine(fig)
+
     change_width(sn, 0.3)
     ax1.get_legend().remove()
     plt.xticks(fontsize=18)
