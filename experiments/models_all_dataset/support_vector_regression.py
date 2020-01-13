@@ -2,7 +2,7 @@ import pandas
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import KFold
 # Sklearn imports
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 
 # Custom imports
@@ -15,9 +15,9 @@ if __name__ == '__main__':
                                                                   return_gender=True)
 
     # Normalizing/scaling  dataset
-    ParkinsonDataset.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
-    ParkinsonDataset.normalize_dataset(dataset=df_females, scaler=MinMaxScaler(), inplace=True)
-    ParkinsonDataset.normalize_dataset(dataset=df_males, scaler=MinMaxScaler(), inplace=True)
+    ParkinsonDataset.normalize_dataset(dataset=df, scaler=StandardScaler(), inplace=True)
+    ParkinsonDataset.normalize_dataset(dataset=df_females, scaler=StandardScaler(), inplace=True)
+    ParkinsonDataset.normalize_dataset(dataset=df_males, scaler=StandardScaler(), inplace=True)
 
     # Split dataset
     # Used in model cross-validated hyper-parameter search

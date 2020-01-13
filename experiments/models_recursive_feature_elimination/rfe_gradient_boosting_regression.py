@@ -34,8 +34,10 @@ if __name__ == '__main__':
     all_feature_masks, all_mae_log = PD.recursive_feature_elimination(model=model, X=X_all,
                                                                       y_total=y_all_total,
                                                                       y_motor=y_all_motor)
-    print("[All] Total features: %s" % numpy.array(PD.FEATURES)[all_feature_masks['Total']])
-    print("[All] Motor features: %s" % numpy.array(PD.FEATURES)[all_feature_masks['Motor']])
+    print("[All] Total features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[all_feature_masks['Total']],
+                                                       numpy.min(all_mae_log['Total'])))
+    print("[All] Motor features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[all_feature_masks['Motor']],
+                                                       numpy.min(all_mae_log['Motor'])))
 
     X_males = df_males[PD.FEATURES].values
     y_total = df_males[PD.TOTAL_UPDRS].values
@@ -43,8 +45,10 @@ if __name__ == '__main__':
     male_feature_masks, male_mae_log = PD.recursive_feature_elimination(model=model, X=X_males,
                                                                         y_total=y_total,
                                                                         y_motor=y_motor)
-    print("[Male] Total features: %s" % numpy.array(PD.FEATURES)[male_feature_masks['Total']])
-    print("[Male] Motor features: %s" % numpy.array(PD.FEATURES)[male_feature_masks['Motor']])
+    print("[Male] Total features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[male_feature_masks['Total']],
+                                                        numpy.min(male_mae_log['Total'])))
+    print("[Male] Motor features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[male_feature_masks['Motor']],
+                                                        numpy.min(male_mae_log['Motor'])))
 
     X_females = df_females[PD.FEATURES].values
     y_total = df_females[PD.TOTAL_UPDRS].values
@@ -53,8 +57,10 @@ if __name__ == '__main__':
                                                                             y_total=y_total,
                                                                             y_motor=y_motor)
 
-    print("[Female] Total features: %s" % numpy.array(PD.FEATURES)[female_feature_masks['Total']])
-    print("[Female] Motor features: %s" % numpy.array(PD.FEATURES)[female_feature_masks['Motor']])
+    print("[Female] Total features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[female_feature_masks['Total']],
+                                                          numpy.min(female_mae_log['Total'])))
+    print("[Female] Motor features: %s \n [MAE %.7f] " % (numpy.array(PD.FEATURES)[female_feature_masks['Motor']],
+                                                          numpy.min(female_mae_log['Motor'])))
 
     plt.figure()
     x_log = range(1, len(all_mae_log['Total']) + 1)

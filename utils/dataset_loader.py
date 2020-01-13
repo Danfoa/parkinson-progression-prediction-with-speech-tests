@@ -120,6 +120,27 @@ class ParkinsonDataset:
         return X_train, X_test, y_train, y_test
 
     @staticmethod
+    def split_dataset_indices(dataset, indices, train_size=0.8, test_size=0.2, subject_partitioning=False):
+        """
+        Partition dataset for training either randomly sampling instances of the dataset to create an
+        80, 10 , 10 partition (train, test, val), or partitioning taking into account subjects ids.
+        i.e. 80 % of the subjects for the training, 10% of the subjects for test, and 10% for validation.
+        :param test_size:
+        :param train_size:
+        :param dataset: Dataset to partition
+        :param subject_partitioning: True to partition data by subjects ids and not by recorded instances
+        :return: Train and test as numpy nd-arrays, and target values with Total and Motor UPDRS as column vectors
+            respectively
+        """
+
+        X = dataset[ParkinsonDataset.FEATURES].values
+        y = dataset[[ParkinsonDataset.TOTAL_UPDRS, ParkinsonDataset.MOTOR_UPDRS]].values
+
+        X_train, X_test, y_train, y_test, train_index, test_index = train_test_split(X, y, indices, train_size=train_size, test_size=test_size)
+
+        return X_train, X_test, y_train, y_test, train_index, test_index
+
+    @staticmethod
     def split_reduced_dataset(X, dataset, train_size=0.8, test_size=0.2, subject_partitioning=False):
         """
         Partition dataset for training either randomly sampling instances of the dataset to create an

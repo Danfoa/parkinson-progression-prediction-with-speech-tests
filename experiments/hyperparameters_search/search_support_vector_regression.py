@@ -12,7 +12,7 @@ from sklearn.model_selection import KFold
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
-from utils.experiment_one_plot import *
+from utils.models_all_dataset_plot import *
 
 
 if __name__ == '__main__':
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     df = ParkinsonDataset.load_dataset(path="../dataset/parkinsons_updrs.data", return_gender=False)
 
     # Normalizing/scaling  dataset
-    ParkinsonDataset.normalize_dataset(dataset=df, scaler=MinMaxScaler(), inplace=True)
+    ParkinsonDataset.normalize_dataset(dataset=df, scaler=StandardScaler(), inplace=True)
 
     # Split dataset
     # Used in model cross-validated hyper-parameter search

@@ -3,9 +3,6 @@ import numpy as np
 with warnings.catch_warnings():
     warnings.simplefilter("ignore")
 from sklearn.mixture import GaussianMixture
-import matplotlib.pyplot as plt
-from matplotlib import style
-style.use('fivethirtyeight')
 import os
 import seaborn as sns
 from matplotlib import pyplot as plt

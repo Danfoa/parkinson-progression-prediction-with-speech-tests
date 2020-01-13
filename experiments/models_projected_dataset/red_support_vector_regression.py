@@ -24,7 +24,7 @@ if __name__ == '__main__':
                                        return_gender=False)
     # Normalizing/scaling  dataset
     feature_normalizers = ParkinsonDataset.normalize_dataset(dataset=df,
-                                                             scaler=MinMaxScaler(),
+                                                             scaler=StandardScaler(),
                                                              inplace=True)
     X_all = df[ParkinsonDataset.FEATURES].values
     y_total = df[ParkinsonDataset.TOTAL_UPDRS].values
@@ -49,7 +49,7 @@ if __name__ == '__main__':
             y_pred_motor_clusters = numpy.ones((num_clusters, len(test_index)))
             # Iterate through each of the projected data-sets and predict a result
             for cluster in range(num_clusters):
-                X_projected = numpy.load(load_path + algorithm + '/C=%d-K=%d-reduced-dataset.npy' % (num_clusters,
+                X_projected = numpy.load(load_path + algorithm + '/C=%d-K=%d-reduced-dataset-std-scaler.npy' % (num_clusters,
                                                                                                      cluster))
                 X_train, X_test = X_projected[train_index, :], X_projected[test_index, :]
 

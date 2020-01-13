@@ -1,16 +1,30 @@
-|                   Models                   | URL                                                                                        |
-|:------------------------------------------:|--------------------------------------------------------------------------------------------|
-| Support Vector Machine Regression          | https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html                     | 
-| ANFIS                                      | https://github.com/twmeggs/anfis                                                           |
-| Regression Neural Network                  | http://neupy.com/apidocs/neupy.algorithms.rbfn.grnn.html                                   | 
-| CART (Classification and Regression Trees) | https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html |
 
+# Measuring Parkinson’s disease progression (CI - MAI)
+## Instructions on how to execute our code
+The scripts that can be executed in order to run our experiments can be
+found under the **experiments** folder:
+  - **hyperparameters\_search**: search of the hyperparameters for each
+    model.
+  - **models\_all\_dataset**: regression using different models and the
+    original dataset.
+  - **models\_projected\_dataset**: regression using different ensembled
+    models and the projected datasets with Clustering + PCA.
+  - **models\_recursive\_feature\_elimination**: regression using GBR and
+    RFR models, with recursive feature elimination (RFE).
+  - **reduction**: inside there is the script that projects (reduces) the
+    dataset using PCA and the different clustering algorithms.
 
-|           Pre-Processing                   | URL                                                                                        |
-|:------------------------------------------:|--------------------------------------------------------------------------------------------|
-| SOM                                     | http://neupy.com/docs/tutorials.html                                                       |    
-| EM                                         | https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html     |
-| PCA                                        | https://scikit-learn.org/stable/modules/generated/sklearn.decomposition.PCA.html           | 
-| LDA                                        | https://scikit-learn.org/stable/modules/generated/sklearn.discriminant_analysis.LinearDiscriminantAnalysis.html |
+These scripts print an output with their results and save them in the
+folder **results**. Under **utils** you can find scripts that, with the
+results obtained by the experiments, generate plots comparing the
+different algorithms. The plots are saved in **media**. To execute all
+our code it is needed to install Python 3 (we recommend Python >= 3.6, at is the one we have used) and some external libraries:
 
-
+  - numpy
+  - sklearn
+  - skfuzzy
+  - fuzzy-c-means
+  - pandas
+  - tensorflow
+  - seaborn
+  - matplotlib

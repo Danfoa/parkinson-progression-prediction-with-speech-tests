@@ -13,7 +13,7 @@ from sklearn.model_selection import KFold
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
-from utils.experiment_one_plot import *
+from utils.models_all_dataset_plot import *
 
 if __name__ == '__main__':
     model_name = "RFR"
