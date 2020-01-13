@@ -1,8 +1,3 @@
-"""
-Functions regarding plotting ... remeber to develop scripts to automatically save plots in the `media` folder.
-
-"""
-
 import seaborn as sn
 import matplotlib.pyplot as plt
 from statistics import mean

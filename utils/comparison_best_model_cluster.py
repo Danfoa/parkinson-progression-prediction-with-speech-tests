@@ -1,26 +1,10 @@
 import matplotlib.pyplot as plt
 import pandas
 import seaborn as sb
-# Anfis+EM
-#7.903273018514029
-#6.12038805854495
 
-#GBR+fuzzy
-#4.110263370760881
-#3.266110069906717
-
-# MLP+som
-#2.8862764088386768
-#2.2763016439621944
-
-# RFR+fuzzy
-#4.058391171758299
-#3.184542339860424
-
-#SVR+som
-#5.10827984495852
-#3.9510130319342722
 sb.set(style="whitegrid")
+
+
 def makePlot(total, motor):
     df = pandas.DataFrame(
         {'Models': ['EM+Anfis', 'fuzzy+GBR', 'som+MLP', 'fuzzy+RFR', 'som+SVR'],
@@ -28,7 +12,6 @@ def makePlot(total, motor):
          'Motor_UPDRS': motor})
     fig, ax1 = plt.subplots(figsize=(15, 11))
     tidy = df.melt(id_vars='Models').rename(columns=str.title)
-
 
     sn = sb.barplot(x='Models', y='Value', hue='Variable', data=tidy, ax=ax1, palette='bone')
 
@@ -45,6 +28,9 @@ def makePlot(total, motor):
     plt.show()
 
     return
+
+
 total = [7.903273018514029, 4.110263370760881, 2.8862764088386768, 4.058391171758299, 5.10827984495852]
-motor = [6.12038805854495, 3.266110069906717, 2.2763016439621944, 3.18454233986042,3.9510130319342722 ]
+motor = [6.12038805854495, 3.266110069906717, 2.2763016439621944, 3.18454233986042, 3.9510130319342722]
+
 makePlot(total, motor)

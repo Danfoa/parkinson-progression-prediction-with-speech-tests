@@ -8,7 +8,7 @@ from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score
 
 # Custom imports
 from utils.dataset_loader import ParkinsonDataset
-from utils.experiment_one_plot import *
+from utils.models_all_dataset_plot import *
 # from clustering_models.fuzzy_c_means import FuzzyCMeans
 from fcmeans import FCM
 
